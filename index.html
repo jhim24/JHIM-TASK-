@@ -461,6 +461,25 @@ checkReminders();
         }
     });
 }
+    function checkReminders(){
+    const today = new Date();
+
+    tasks.forEach(t => {
+        if(!t.due) return;
+
+        const dueDate = new Date(t.due);
+
+        const diff = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+
+        if(diff === 1){
+            alert("🔔 Bukas na due: " + t.task);
+        }
+
+        if(diff === 3){
+            alert("⏰ 3 days before: " + t.task);
+        }
+    });
+}
 render();
 </script>
 
