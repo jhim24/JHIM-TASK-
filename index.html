@@ -438,7 +438,29 @@ function del(i){
     save();
     render();
 }
+checkReminders();
+    function checkReminders(){
+    const today = new Date();
 
+    tasks.forEach(t => {
+        if(!t.due) return;
+
+        const dueDate = new Date(t.due);
+
+        // difference in days
+        const diff = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+
+        // 🔔 Tomorrow reminder
+        if(diff === 1){
+            alert("🔔 Reminder: Bukas na due → " + t.task);
+        }
+
+        // 🔔 3 days before reminder
+        if(diff === 3){
+            alert("⏰ Reminder: 3 days before due → " + t.task);
+        }
+    });
+}
 render();
 </script>
 
