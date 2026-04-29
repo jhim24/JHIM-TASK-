@@ -4,13 +4,102 @@
 <meta charset="UTF-8">
 <title>To-Do Dashboard</title>
 <link rel="icon" type="image/svg+xml" href="icon.svg">
+
 <style>
-/* ===== ORIGINAL CSS (UNCHANGED) ===== */
-body {font-family:'Segoe UI', Arial;margin:0;background: linear-gradient(135deg,#dfe9f3,#f5f7fa);}
-.header {background: linear-gradient(135deg,#2c5fa8,#1f4f91);color:white;text-align:center;padding:12px 10px;}
+/* ===== YOUR ORIGINAL CSS (UNCHANGED) ===== */
+body {
+    font-family:'Segoe UI', Arial;
+    margin:0;
+    background: linear-gradient(135deg,#dfe9f3,#f5f7fa);
+}
+.header {
+    background: linear-gradient(135deg,#2c5fa8,#1f4f91);
+    color:white;
+    text-align:center;
+    padding:12px 10px;
+}
+.header h1{margin:0;font-size:20px;}
+.header p{margin:2px 0 0;font-size:12px;}
+
 .container { padding:20px; max-width:1100px; margin:auto; }
 
-/* KEEP ALL YOUR ORIGINAL CSS BELOW (no change) */
+.cards { display:flex; gap:15px; flex-wrap:wrap; }
+.card {
+    flex:1; min-width:160px;
+    background:linear-gradient(135deg,#ffffff,#f1f4f9);
+    border-radius:12px; text-align:center;
+    box-shadow:0 5px 15px rgba(0,0,0,0.08);
+}
+.card-header { padding:10px; color:white; font-weight:bold; }
+.card-body { font-size:24px; padding:18px; }
+
+.blue{background:#2c5fa8;}
+.green{background:#2fa84f;}
+.red{background:#d83b3b;}
+.orange{background:#f39c12;}
+.gray{background:#7f8c8d;}
+
+.open-btn {
+    margin-top:20px;
+    padding:10px 15px;
+    background:#2c5fa8;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.controls { display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+.controls input, .controls select {
+    padding:8px; border-radius:6px; border:1px solid #ccc;
+}
+
+table {
+    width:100%; border-collapse:collapse; margin-top:20px;
+    background:linear-gradient(135deg,#ffffff,#f4f7fb);
+    border-radius:10px; overflow:hidden;
+}
+th, td { border:1px solid #d6dee6; padding:12px; text-align:center; }
+th { background:#2c5fa8; color:white; }
+tr:nth-child(even){ background:#f1f5fa; }
+
+.badge { padding:6px 10px; border-radius:6px; color:white; font-size:12px; }
+.high{background:#e74c3c;}
+.low{background:#f39c12;}
+.progress-status{background:#3498db;}
+.not{background:#7f8c8d;}
+.done{background:#2ecc71;}
+
+.action-btn {
+    padding:6px 10px; margin:2px; border:none;
+    border-radius:6px; cursor:pointer; font-size:12px;
+}
+.edit{background:#3498db;color:white;}
+.delete{background:#e74c3c;color:white;}
+
+.modal {
+    display:none; position:fixed; z-index:1000;
+    left:0; top:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.5);
+}
+.modal-content {
+    background:linear-gradient(135deg,#ffffff,#eef3f9);
+    margin:10% auto; padding:20px;
+    width:90%; max-width:450px; border-radius:12px;
+}
+.close { float:right; font-size:20px; cursor:pointer; }
+
+.form-grid {
+    display:grid; grid-template-columns:1fr 1fr; gap:12px;
+}
+.form-grid input,.form-grid select {
+    width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;
+}
+.form-grid button {
+    grid-column:span 2;
+    padding:10px; background:#2c5fa8; color:white;
+    border:none; border-radius:6px;
+}
 </style>
 </head>
 
@@ -22,8 +111,16 @@ body {font-family:'Segoe UI', Arial;margin:0;background: linear-gradient(135deg,
 <p>JEMMEL LOZADA</p>
 </div>
 
-<!-- ================= TASK SECTION (UNCHANGED) ================= -->
+<!-- ================= TASK SECTION ================= -->
 <div id="taskSection" class="container">
+
+<div class="cards">
+<div class="card"><div class="card-header blue">TOTAL</div><div class="card-body" id="total">0</div></div>
+<div class="card"><div class="card-header green">COMPLETED</div><div class="card-body" id="completed">0</div></div>
+<div class="card"><div class="card-header red">PENDING</div><div class="card-body" id="pending">0</div></div>
+<div class="card"><div class="card-header orange">IN PROGRESS</div><div class="card-body" id="inprogress">0</div></div>
+<div class="card"><div class="card-header gray">NOT STARTED</div><div class="card-body" id="notstarted">0</div></div>
+</div>
 
 <button class="open-btn" onclick="openModal()">+ Add Task</button>
 <button class="open-btn" onclick="showCheque()">💰 Cheque System</button>
@@ -32,10 +129,10 @@ body {font-family:'Segoe UI', Arial;margin:0;background: linear-gradient(135deg,
 
 </div>
 
-<!-- ================= CHEQUE SECTION (NEW ONLY) ================= -->
+<!-- ================= CHEQUE SECTION (NEW) ================= -->
 <div id="chequeSection" class="container" style="display:none;">
 
-<h2>Cheque Management</h2>
+<h2>Cheque System</h2>
 
 <input id="client" placeholder="Client Name">
 <input id="chequeNo" placeholder="Cheque No">
@@ -56,26 +153,63 @@ body {font-family:'Segoe UI', Arial;margin:0;background: linear-gradient(135deg,
 
 </div>
 
+<!-- ================= MODAL (UNCHANGED) ================= -->
+<div id="taskModal" class="modal">
+<div class="modal-content">
+<span class="close" onclick="closeModal()">×</span>
+
+<h3>Add Task</h3>
+
+<div class="form-grid">
+<input type="text" id="task" placeholder="Task name">
+
+<select id="category">
+<option>Work</option>
+<option>Personal</option>
+<option>Learning</option>
+<option>Health</option>
+</select>
+
+<select id="priority">
+<option>High</option>
+<option>Low</option>
+</select>
+
+<select id="status">
+<option>Completed</option>
+<option>In Progress</option>
+<option>Not Started</option>
+</select>
+
+<input type="date" id="due">
+
+<button onclick="addTask()">Save Task</button>
+</div>
+</div>
+</div>
+
 <script>
 
-/* ================= ORIGINAL TASK SYSTEM (UNCHANGED) ================= */
-
+/* ===== ORIGINAL TASK SYSTEM ===== */
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-let taskEditIndex = -1;
+let editIndex = -1;
+
+function save(){ localStorage.setItem("tasks", JSON.stringify(tasks)); }
+function openModal(){ taskModal.style.display="block"; }
+function closeModal(){ taskModal.style.display="none"; }
 
 function render(){
-    const table=document.getElementById("table");
+    const table=table = document.getElementById("table");
 
-    table.innerHTML=`
-    <tr>
-    <th>Task</th><th>Status</th><th>Action</th>
-    </tr>`;
+    table.innerHTML=`<tr>
+    <th>Task</th><th>Status</th><th>Due</th><th>Action</th></tr>`;
 
     tasks.forEach((t,i)=>{
         table.innerHTML+=`
         <tr>
         <td>${t.task}</td>
         <td>${t.status}</td>
+        <td>${t.due||'-'}</td>
         <td>
         <button onclick="editTask(${i})">Edit</button>
         <button onclick="del(${i})">Delete</button>
@@ -87,52 +221,42 @@ function render(){
 function addTask(){
     const task=document.getElementById("task").value;
 
-    if(taskEditIndex===-1){
-        tasks.push({task:task,status:"Pending"});
+    if(editIndex==-1){
+        tasks.push({task,status:"Pending",due:due.value});
     }else{
-        tasks[taskEditIndex].task=task;
-        taskEditIndex=-1;
+        tasks[editIndex]={task,status:"Pending",due:due.value};
+        editIndex=-1;
     }
 
-    localStorage.setItem("tasks",JSON.stringify(tasks));
-    render();
+    save(); render(); closeModal();
 }
 
 function editTask(i){
     document.getElementById("task").value=tasks[i].task;
-    taskEditIndex=i;
+    editIndex=i;
+    openModal();
 }
 
-function del(i){
-    tasks.splice(i,1);
-    localStorage.setItem("tasks",JSON.stringify(tasks));
-    render();
-}
+function del(i){ tasks.splice(i,1); save(); render(); }
 
-/* ================= TOGGLE ================= */
-
+/* ===== TOGGLE ===== */
 function showCheque(){
     taskSection.style.display="none";
     chequeSection.style.display="block";
     renderCheque();
 }
-
 function showTasks(){
     taskSection.style.display="block";
     chequeSection.style.display="none";
 }
 
-/* ================= CHEQUE SYSTEM (ADDED ONLY) ================= */
-
+/* ===== CHEQUE SYSTEM (ADDED ONLY) ===== */
 let cheques = JSON.parse(localStorage.getItem("cheques")) || [];
 let chequeEditIndex = -1;
 
-function saveCheque(){
-    localStorage.setItem("cheques", JSON.stringify(cheques));
-}
+function saveCheque(){ localStorage.setItem("cheques", JSON.stringify(cheques)); }
 
 function addCheque(){
-
     const data={
         client:client.value,
         chequeNo:chequeNo.value,
@@ -143,46 +267,27 @@ function addCheque(){
 
     if(!data.client) return alert("Enter client");
 
-    if(chequeEditIndex === -1){
-        cheques.push(data);
-    }else{
-        cheques[chequeEditIndex] = data;
-        chequeEditIndex = -1;
-    }
+    if(chequeEditIndex===-1) cheques.push(data);
+    else { cheques[chequeEditIndex]=data; chequeEditIndex=-1; }
 
-    client.value="";
-    chequeNo.value="";
-    amount.value="";
-    chequeDue.value="";
+    client.value=""; chequeNo.value=""; amount.value=""; chequeDue.value="";
 
-    saveCheque();
-    renderCheque();
+    saveCheque(); renderCheque();
 }
 
 function renderCheque(){
-
     const table=document.getElementById("chequeTable");
 
-    table.innerHTML=`
-    <tr>
-    <th>Client</th>
-    <th>Cheque</th>
-    <th>Amount</th>
-    <th>Due</th>
-    <th>Status</th>
-    <th>Reminder</th>
-    <th>Action</th>
-    </tr>`;
+    table.innerHTML=`<tr>
+    <th>Client</th><th>Cheque</th><th>Amount</th>
+    <th>Due</th><th>Status</th><th>Reminder</th><th>Action</th></tr>`;
 
     const today=new Date();
 
     cheques.forEach((c,i)=>{
-
-        const dueDate=new Date(c.due);
-        const diff=Math.ceil((dueDate - today)/(1000*60*60*24));
+        const diff=Math.ceil((new Date(c.due)-today)/(1000*60*60*24));
 
         let reminder="";
-
         if(c.status==="Pending"){
             if(diff<=3 && diff>=0) reminder="⚠ Due Soon";
             else if(diff<0) reminder="❌ Overdue";
@@ -223,7 +328,6 @@ function deleteCheque(i){
 }
 
 render();
-
 </script>
 
 </body>
