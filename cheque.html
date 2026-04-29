@@ -15,12 +15,13 @@ h2{
 }
 
 button{
-    padding:10px;
-    margin:5px;
+    padding:8px 12px;
+    margin:3px;
     background:#2c5fa8;
     color:white;
     border:none;
     border-radius:6px;
+    cursor:pointer;
 }
 
 input,select{
@@ -68,7 +69,7 @@ th{
 <option>Returned</option>
 </select>
 
-<button onclick="addCheque()">Add Cheque</button>
+<button onclick="addCheque()">Save Cheque</button>
 
 <!-- TABLE -->
 <table id="table"></table>
@@ -76,6 +77,7 @@ th{
 <script>
 
 let cheques = JSON.parse(localStorage.getItem("cheques")) || [];
+let editIndex = -1;
 
 function save(){
     localStorage.setItem("cheques", JSON.stringify(cheques));
@@ -93,12 +95,18 @@ function addCheque(){
 
     if(!data.client) return alert("Enter client name");
 
- if(editIndex === -1){
-    cheques.push(data);
-}else{
-    cheques[editIndex] = data;
-    editIndex = -1;
-}
+    if(editIndex === -1){
+        cheques.push(data);
+    }else{
+        cheques[editIndex] = data;
+        editIndex = -1;
+    }
+
+    // clear form
+    document.getElementById("client").value="";
+    document.getElementById("chequeNo").value="";
+    document.getElementById("amount").value="";
+    document.getElementById("due").value="";
 
     save();
     render();
@@ -115,11 +123,14 @@ function render(){
     <th>Amount</th>
     <th>Due</th>
     <th>Status</th>
-   <th>Reminder</th>
-<th>Action</th>
+    <th>Reminder</th>
+    <th>Action</th>
+    </tr>
+    `;
+
     const today=new Date();
 
-  cheques.forEach((c,i)=>{
+    cheques.forEach((c,i)=>{
 
         const due=new Date(c.due);
         const diff=Math.ceil((due - today)/(1000*60*60*24));
@@ -141,16 +152,17 @@ function render(){
         <td>${c.amount}</td>
         <td>${c.due}</td>
         <td>${c.status}</td>
-       <td class="${diff<=3?'red':''}">${reminder}</td>
-<td>
-<button onclick="editCheque(${i})">Edit</button>
-<button onclick="deleteCheque(${i})">Delete</button>
-</td>
-        </tr>`;
+        <td class="${diff<=3?'red':''}">${reminder}</td>
+        <td>
+            <button onclick="editCheque(${i})">Edit</button>
+            <button onclick="deleteCheque(${i})">Delete</button>
+        </td>
+        </tr>
+        `;
     });
 }
-let editIndex = -1;
-    function editCheque(i){
+
+function editCheque(i){
     const c = cheques[i];
 
     document.getElementById("client").value = c.client;
@@ -169,6 +181,7 @@ function deleteCheque(i){
         render();
     }
 }
+
 render();
 
 </script>
