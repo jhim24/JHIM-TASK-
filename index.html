@@ -238,7 +238,7 @@ tr:hover {
 <p>JEMMEL LOZADA</p>
 </div>
 
-<div class="container">
+<div id="taskSection" class="container">
 
 <!-- CARDS -->
 
@@ -249,11 +249,33 @@ tr:hover {
 <div class="card"><div class="card-header orange">IN PROGRESS</div><div class="card-body" id="inprogress">0</div></div>
 <div class="card"><div class="card-header gray">NOT STARTED</div><div class="card-body" id="notstarted">0</div></div>
 </div>
+<div id="chequeSection" style="display:none; padding:20px;">
 
+<h2>Cheque System</h2>
+
+<input id="client" placeholder="Client Name">
+<input id="chequeNo" placeholder="Cheque No">
+<input id="amount" type="number" placeholder="Amount">
+<input id="due" type="date">
+
+<select id="status">
+<option>Pending</option>
+<option>Deposited</option>
+<option>Paid (Cash)</option>
+<option>Returned</option>
+</select>
+
+<button onclick="addCheque()">Save Cheque</button>
+
+<table id="chequeTable"></table>
+
+</div>
 <!-- ADD BUTTON -->
 
 <button class="open-btn" onclick="openModal()">+ Add Task</button>
 <button class="open-btn" onclick="openChequePage()">💰 Cheque Reminder</button>
+<button class="open-btn" onclick="showCheque()">💰 Cheque System</button>
+<button class="open-btn" onclick="showTasks()">📋 Back to Tasks</button>
 
 <!-- CONTROLS -->
 
@@ -439,8 +461,108 @@ function del(i){
     save();
     render();
 }
-function openChequePage(){
-    window.open("cheque.html", "_blank");
+function showCheque(){
+    document.getElementById("taskSection").style.display="none";
+    document.getElementById("chequeSection").style.display="block";
+    renderCheque();
+}
+
+function showTasks(){
+    document.getElementById("taskSection").style.display="block";
+    document.getElementById("chequeSection").style.display="none";
+}
+    let cheques = JSON.parse(localStorage.getItem("cheques")) || [];
+let editIndex = -1;
+
+function saveCheque(){
+    localStorage.setItem("cheques", JSON.stringify(cheques));
+}
+
+function addCheque(){
+
+    const data={
+        client:client.value,
+        chequeNo:chequeNo.value,
+        amount:amount.value,
+        due:due.value,
+        status:status.value
+    };
+
+    if(!data.client) return alert("Enter client");
+
+    if(editIndex === -1){
+        cheques.push(data);
+    }else{
+        cheques[editIndex] = data;
+        editIndex = -1;
+    }
+
+    saveCheque();
+    renderCheque();
+}
+
+function renderCheque(){
+
+    const table=document.getElementById("chequeTable");
+
+    table.innerHTML=`
+    <tr>
+    <th>Client</th>
+    <th>Cheque</th>
+    <th>Amount</th>
+    <th>Due</th>
+    <th>Status</th>
+    <th>Reminder</th>
+    <th>Action</th>
+    </tr>
+    `;
+
+    const today=new Date();
+
+    cheques.forEach((c,i)=>{
+
+        const dueDate=new Date(c.due);
+        const diff=Math.ceil((dueDate - today)/(1000*60*60*24));
+
+        let reminder="";
+
+        if(c.status==="Pending"){
+            if(diff<=3 && diff>=0) reminder="⚠ Due Soon";
+            else if(diff<0) reminder="❌ Overdue";
+        }
+
+        table.innerHTML+=`
+        <tr>
+        <td>${c.client}</td>
+        <td>${c.chequeNo}</td>
+        <td>${c.amount}</td>
+        <td>${c.due}</td>
+        <td>${c.status}</td>
+        <td class="${diff<=3?'red':''}">${reminder}</td>
+        <td>
+            <button onclick="editCheque(${i})">Edit</button>
+            <button onclick="deleteCheque(${i})">Delete</button>
+        </td>
+        </tr>`;
+    });
+}
+
+function editCheque(i){
+    const c=cheques[i];
+    client.value=c.client;
+    chequeNo.value=c.chequeNo;
+    amount.value=c.amount;
+    due.value=c.due;
+    status.value=c.status;
+    editIndex=i;
+}
+
+function deleteCheque(i){
+    if(confirm("Delete?")){
+        cheques.splice(i,1);
+        saveCheque();
+        renderCheque();
+    }
 }
 render();
 </script>
