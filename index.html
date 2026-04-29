@@ -330,11 +330,22 @@ function renderCheque(){
         const diff=Math.ceil((new Date(c.due)-today)/(1000*60*60*24));
 
         let reminder="";
-        if(c.status==="Pending"){
-            if(diff<=3 && diff>=0) reminder="⚠ Due Soon";
-            else if(diff<0) reminder="❌ Overdue";
-        }
+       if(c.status==="Pending"){
 
+    if(diff > 1){
+        reminder = "Due in " + diff + " days";
+    }
+    else if(diff === 1){
+        reminder = "Due tomorrow";
+    }
+    else if(diff === 0){
+        reminder = "Due today";
+    }
+    else if(diff < 0){
+        reminder = "Overdue";
+    }
+
+}
        table.innerHTML+=`
 <tr>
 <td>${c.client}</td>
@@ -353,8 +364,7 @@ ${c.status}
 </span>
 </td>
 
-<td class="${diff<=3?'red':''}">${reminder}</td>
-
+<<td>${reminder}</td>
 <td>
 <button onclick="editCheque(${i})">Edit</button>
 <button onclick="deleteCheque(${i})">Delete</button>
