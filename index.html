@@ -155,6 +155,9 @@ tr:nth-child(even){ background:#f1f5fa; }
 <div class="card"><div class="card-header orange">PENDING</div><div class="card-body" id="totalPending">0</div></div>
 <div class="card"><div class="card-header red">RETURNED</div><div class="card-body" id="totalReturned">0</div></div>
 </div>
+    <div style="margin:10px 0; font-weight:bold;">
+Returned to Client: <span id="returnedClientCount">0</span>
+</div>
     
     <select id="filterStatus" onchange="renderCheque()">
 <option value="All">All</option>
@@ -162,6 +165,7 @@ tr:nth-child(even){ background:#f1f5fa; }
 <option value="Paid (Cash)">Paid (Cash)</option>
 <option value="Deposited">Deposited</option>
 <option value="Returned">Returned</option>
+<option>Returned to Client</option>
 </select>
 
 <input id="client" placeholder="Client Name">
@@ -403,6 +407,9 @@ ${c.status}
 </td>
 </tr>`;
     });
+    let returnedToClient = cheques.filter(c => c.status==="Returned to Client").length;
+
+document.getElementById("returnedClientCount").innerText = returnedToClient;
 }
 
 function editCheque(i){
