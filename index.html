@@ -219,16 +219,35 @@ function render(){
 }
 
 function addTask(){
-    const task=document.getElementById("task").value;
 
-    if(editIndex==-1){
-        tasks.push({task,status:"Pending",due:due.value});
-    }else{
-        tasks[editIndex]={task,status:"Pending",due:due.value};
-        editIndex=-1;
+    const task = document.getElementById("task").value;
+    const category = document.getElementById("category").value;
+    const priority = document.getElementById("priority").value;
+    const status = document.getElementById("status").value;
+    const due = document.getElementById("due").value;
+
+    if(!task) return alert("Enter task");
+
+    const newTask = {
+        task: task,
+        cat: category,
+        priority: priority,
+        status: status,
+        due: due
+    };
+
+    if(editIndex === -1){
+        tasks.push(newTask);
+    } else {
+        tasks[editIndex] = newTask;
+        editIndex = -1;
     }
 
-    save(); render(); closeModal();
+    document.getElementById("task").value = "";
+
+    save();
+    render();
+    closeModal();
 }
 
 function editTask(i){
