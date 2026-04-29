@@ -179,6 +179,7 @@ Returned to Client: <span id="returnedClientCount">0</span>
 <option>Paid (Cash)</option>
 <option>Returned</option>
 <option>Cleared</option>
+<option>Returned to Client</option>
 </select>
 
 <button onclick="addCheque()">Save Cheque</button>
@@ -360,56 +361,65 @@ function renderCheque(){
     const today=new Date();
 
     [...cheques]
-.sort((a,b)=> new Date(a.due) - new Date(b.due))
-.forEach((c,i)=>{
-    if(filter !== "All" && c.status !== filter) return;
+    .sort((a,b)=> new Date(a.due) - new Date(b.due))
+    .forEach((c,i)=>{
+
+        if(filter !== "All" && c.status !== filter) return;
+
         const diff=Math.ceil((new Date(c.due)-today)/(1000*60*60*24));
 
         let reminder="";
-       if(c.status==="Pending"){
+        if(c.status==="Pending"){
+            if(diff > 1) reminder = "Due in " + diff + " days";
+            else if(diff === 1) reminder = "Due tomorrow";
+            else if(diff === 0) reminder = "Due today";
+            else reminder = "Overdue";
+        }
 
-    if(diff > 1){
-        reminder = "Due in " + diff + " days";
-    }
-    else if(diff === 1){
-        reminder = "Due tomorrow";
-    }
-    else if(diff === 0){
-        reminder = "Due today";
-    }
-    else if(diff < 0){
-        reminder = "Overdue";
-    }
+        table.innerHTML+=`
+        <tr class="${diff < 0 && c.status==='Pending' ? 'overdue-row' : ''}">
+        <td>${c.client}</td>
+        <td>${c.chequeNo}</td>
+        <td>${c.amount}</td>
+        <td>${c.due}</td>
 
-}
-       table.innerHTML+=`
-<tr class="${diff < 0 && c.status==='Pending' ? 'overdue-row' : ''}">
-<td>${c.client}</td>
-<td>${c.chequeNo}</td>
-<td>${c.amount}</td>
-<td>${c.due}</td>
+        <td>
+        <span class="status-badge ${
+            c.status==="Pending" ? "pending" :
+            c.status==="Deposited" ? "deposited" :
+            c.status==="Paid (Cash)" ? "paid" :
+            c.status==="Cleared" ? "paid" :
+            "returned"
+        }">
+        ${c.status}
+        </span>
+        </td>
 
-<td>
-<span class="status-badge ${
-    c.status==="Pending" ? "pending" :
-    c.status==="Deposited" ? "deposited" :
-    c.status==="Paid (Cash)" ? "paid" :
-    "returned"
-}">
-${c.status}
-</span>
-</td>
-
-<td>${reminder}</td>
-<td>
-<button onclick="editCheque(${i})">Edit</button>
-<button onclick="deleteCheque(${i})">Delete</button>
-</td>
-</tr>`;
+        <td>${reminder}</td>
+        <td>
+        <button onclick="editCheque(${i})">Edit</button>
+        <button onclick="deleteCheque(${i})">Delete</button>
+        </td>
+        </tr>`;
     });
-    let returnedToClient = cheques.filter(c => c.status==="Returned to Client").length;
 
-document.getElementById("returnedClientCount").innerText = returnedToClient;
+    // ✅ TOTALS UPDATE (FIXED)
+    let collected = cheques.filter(c => c.status==="Cleared")
+    .reduce((sum,c)=> sum + Number(c.amount || 0),0);
+
+    let pending = cheques.filter(c => c.status==="Pending")
+    .reduce((sum,c)=> sum + Number(c.amount || 0),0);
+
+    let returned = cheques.filter(c => c.status==="Returned")
+    .reduce((sum,c)=> sum + Number(c.amount || 0),0);
+
+    document.getElementById("totalCollected").innerText = collected;
+    document.getElementById("totalPending").innerText = pending;
+    document.getElementById("totalReturned").innerText = returned;
+
+    // returned to client count
+    let returnedToClient = cheques.filter(c => c.status==="Returned to Client").length;
+    document.getElementById("returnedClientCount").innerText = returnedToClient;
 }
 
 function editCheque(i){
