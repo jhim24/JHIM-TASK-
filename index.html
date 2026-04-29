@@ -199,34 +199,35 @@ function openModal(){ taskModal.style.display="block"; }
 function closeModal(){ taskModal.style.display="none"; }
 
 function render(){
-   const table = document.getElementById("table");
 
-  table.innerHTML=`
-<tr>
-<th>Task</th>
-<th>Category</th>
-<th>Priority</th>
-<th>Status</th>
-<th>Due</th>
-<th>Action</th>
-</tr>`;
+    const table = document.getElementById("table");
 
-tasks.forEach((t,i)=>{
-    table.innerHTML+=`
+    table.innerHTML=`
     <tr>
-    <td>${t.task}</td>
-    <td>${t.cat}</td>
-    <td>${t.priority}</td>
-    <td>${t.status}</td>
-    <td>${t.due || '-'}</td>
-    <td>
-        <button class="action-btn edit" onclick="editTask(${i})">Edit</button>
-        <button class="action-btn delete" onclick="del(${i})">Delete</button>
-    </td>
+    <th>Task</th>
+    <th>Category</th>
+    <th>Priority</th>
+    <th>Status</th>
+    <th>Due</th>
+    <th>Action</th>
     </tr>`;
-});
-    }
 
+    tasks.forEach((t,i)=>{
+        table.innerHTML+=`
+        <tr>
+        <td>${t.task}</td>
+        <td>${t.cat}</td>
+        <td>${t.priority}</td>
+        <td>${t.status}</td>
+        <td>${t.due || '-'}</td>
+        <td>
+            <button class="action-btn edit" onclick="editTask(${i})">Edit</button>
+            <button class="action-btn delete" onclick="del(${i})">Delete</button>
+        </td>
+        </tr>`;
+    });
+
+}
 function addTask(){
 
     const task = document.getElementById("task").value;
