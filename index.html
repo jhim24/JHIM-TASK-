@@ -113,6 +113,10 @@ tr:nth-child(even){ background:#f1f5fa; }
 .deposited{background:#3498db;}
 .paid{background:#2ecc71;}
 .returned{background:#e74c3c;}
+    /* OVERDUE ROW */
+.overdue-row{
+    background:#ffe5e5 !important;
+}
 </style>
 </head>
 
@@ -146,6 +150,14 @@ tr:nth-child(even){ background:#f1f5fa; }
 <div id="chequeSection" class="container" style="display:none;">
 
 <h2>Cheque System</h2>
+    
+    <select id="filterStatus" onchange="renderCheque()">
+<option value="All">All</option>
+<option value="Pending">Pending</option>
+<option value="Paid (Cash)">Paid (Cash)</option>
+<option value="Deposited">Deposited</option>
+<option value="Returned">Returned</option>
+</select>
 
 <input id="client" placeholder="Client Name">
 <input id="chequeNo" placeholder="Cheque No">
@@ -319,6 +331,7 @@ function addCheque(){
 
 function renderCheque(){
     const table=document.getElementById("chequeTable");
+    const filter = document.getElementById("filterStatus").value;
 
     table.innerHTML=`<tr>
     <th>Client</th><th>Cheque</th><th>Amount</th>
@@ -326,7 +339,10 @@ function renderCheque(){
 
     const today=new Date();
 
-    cheques.forEach((c,i)=>{
+    [...cheques]
+.sort((a,b)=> new Date(a.due) - new Date(b.due))
+.forEach((c,i)=>{
+    if(filter !== "All" && c.status !== filter) return;
         const diff=Math.ceil((new Date(c.due)-today)/(1000*60*60*24));
 
         let reminder="";
@@ -347,7 +363,7 @@ function renderCheque(){
 
 }
        table.innerHTML+=`
-<tr>
+<tr class="${diff < 0 && c.status==='Pending' ? 'overdue-row' : ''}">
 <td>${c.client}</td>
 <td>${c.chequeNo}</td>
 <td>${c.amount}</td>
