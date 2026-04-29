@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Cheque Reminder</title>
+<title>Cheque System</title>
 
 <style>
 body{
@@ -12,6 +12,20 @@ body{
 
 h2{
     text-align:center;
+}
+
+button{
+    padding:10px;
+    margin:5px;
+    background:#2c5fa8;
+    color:white;
+    border:none;
+    border-radius:6px;
+}
+
+input,select{
+    padding:8px;
+    margin:5px;
 }
 
 table{
@@ -31,23 +45,59 @@ th{
     color:white;
 }
 
-.red{
-    color:red;
-    font-weight:bold;
-}
+.red{color:red;font-weight:bold;}
+.green{color:green;font-weight:bold;}
 </style>
 
 </head>
 
 <body>
 
-<h2>Cheque Reminder</h2>
+<h2>Cheque Management System</h2>
 
+<!-- FORM -->
+<input id="client" placeholder="Client Name">
+<input id="chequeNo" placeholder="Cheque No">
+<input id="amount" type="number" placeholder="Amount">
+<input id="due" type="date">
+
+<select id="status">
+<option>Pending</option>
+<option>Deposited</option>
+<option>Paid (Cash)</option>
+<option>Returned</option>
+</select>
+
+<button onclick="addCheque()">Add Cheque</button>
+
+<!-- TABLE -->
 <table id="table"></table>
 
 <script>
 
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let cheques = JSON.parse(localStorage.getItem("cheques")) || [];
+
+function save(){
+    localStorage.setItem("cheques", JSON.stringify(cheques));
+}
+
+function addCheque(){
+
+    const data={
+        client:document.getElementById("client").value,
+        chequeNo:document.getElementById("chequeNo").value,
+        amount:document.getElementById("amount").value,
+        due:document.getElementById("due").value,
+        status:document.getElementById("status").value
+    };
+
+    if(!data.client) return alert("Enter client name");
+
+    cheques.push(data);
+
+    save();
+    render();
+}
 
 function render(){
 
@@ -58,41 +108,38 @@ function render(){
     <th>Client</th>
     <th>Cheque No</th>
     <th>Amount</th>
-    <th>Due Date</th>
+    <th>Due</th>
     <th>Status</th>
     <th>Reminder</th>
     </tr>`;
 
     const today=new Date();
 
-    tasks.forEach(t=>{
+    cheques.forEach(c=>{
 
-        if(!t.due) return;
-
-        const due=new Date(t.due);
-
+        const due=new Date(c.due);
         const diff=Math.ceil((due - today)/(1000*60*60*24));
 
         let reminder="";
 
-        if(diff<=3 && diff>=0){
-            reminder="⚠ Due Soon";
-        }
-        else if(diff<0){
-            reminder="❌ Overdue";
+        if(c.status === "Pending"){
+            if(diff<=3 && diff>=0){
+                reminder="⚠ Due Soon";
+            } else if(diff<0){
+                reminder="❌ Overdue";
+            }
         }
 
         table.innerHTML+=`
         <tr>
-        <td>${t.client || '-'}</td>
-        <td>${t.chequeNo || '-'}</td>
-        <td>${t.amount || '-'}</td>
-        <td>${t.due}</td>
-        <td>${t.status || 'Pending'}</td>
+        <td>${c.client}</td>
+        <td>${c.chequeNo}</td>
+        <td>${c.amount}</td>
+        <td>${c.due}</td>
+        <td>${c.status}</td>
         <td class="${diff<=3?'red':''}">${reminder}</td>
         </tr>`;
     });
-
 }
 
 render();
