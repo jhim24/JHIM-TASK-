@@ -201,22 +201,30 @@ function closeModal(){ taskModal.style.display="none"; }
 function render(){
     const table=table = document.getElementById("table");
 
-    table.innerHTML=`<tr>
-    <th>Task</th><th>Status</th><th>Due</th><th>Action</th></tr>`;
+  table.innerHTML=`
+<tr>
+<th>Task</th>
+<th>Category</th>
+<th>Priority</th>
+<th>Status</th>
+<th>Due</th>
+<th>Action</th>
+</tr>`;
 
-    tasks.forEach((t,i)=>{
-        table.innerHTML+=`
-        <tr>
-        <td>${t.task}</td>
-        <td>${t.status}</td>
-        <td>${t.due||'-'}</td>
-        <td>
-        <button onclick="editTask(${i})">Edit</button>
-        <button onclick="del(${i})">Delete</button>
-        </td>
-        </tr>`;
-    });
-}
+tasks.forEach((t,i)=>{
+    table.innerHTML+=`
+    <tr>
+    <td>${t.task}</td>
+    <td>${t.cat}</td>
+    <td>${t.priority}</td>
+    <td>${t.status}</td>
+    <td>${t.due || '-'}</td>
+    <td>
+        <button class="action-btn edit" onclick="editTask(${i})">Edit</button>
+        <button class="action-btn delete" onclick="del(${i})">Delete</button>
+    </td>
+    </tr>`;
+});
 
 function addTask(){
 
