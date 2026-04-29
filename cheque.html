@@ -93,7 +93,12 @@ function addCheque(){
 
     if(!data.client) return alert("Enter client name");
 
+ if(editIndex === -1){
     cheques.push(data);
+}else{
+    cheques[editIndex] = data;
+    editIndex = -1;
+}
 
     save();
     render();
@@ -110,12 +115,11 @@ function render(){
     <th>Amount</th>
     <th>Due</th>
     <th>Status</th>
-    <th>Reminder</th>
-    </tr>`;
-
+   <th>Reminder</th>
+<th>Action</th>
     const today=new Date();
 
-    cheques.forEach(c=>{
+  cheques.forEach((c,i)=>{
 
         const due=new Date(c.due);
         const diff=Math.ceil((due - today)/(1000*60*60*24));
@@ -137,11 +141,34 @@ function render(){
         <td>${c.amount}</td>
         <td>${c.due}</td>
         <td>${c.status}</td>
-        <td class="${diff<=3?'red':''}">${reminder}</td>
+       <td class="${diff<=3?'red':''}">${reminder}</td>
+<td>
+<button onclick="editCheque(${i})">Edit</button>
+<button onclick="deleteCheque(${i})">Delete</button>
+</td>
         </tr>`;
     });
 }
+let editIndex = -1;
+    function editCheque(i){
+    const c = cheques[i];
 
+    document.getElementById("client").value = c.client;
+    document.getElementById("chequeNo").value = c.chequeNo;
+    document.getElementById("amount").value = c.amount;
+    document.getElementById("due").value = c.due;
+    document.getElementById("status").value = c.status;
+
+    editIndex = i;
+}
+
+function deleteCheque(i){
+    if(confirm("Delete this cheque?")){
+        cheques.splice(i,1);
+        save();
+        render();
+    }
+}
 render();
 
 </script>
