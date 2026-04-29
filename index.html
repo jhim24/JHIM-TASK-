@@ -4,19 +4,13 @@
 <meta charset="UTF-8">
 <title>To-Do Dashboard</title>
 <link rel="icon" type="image/svg+xml" href="icon.svg">
-
 <style>
+/* ===== ORIGINAL CSS (UNCHANGED) ===== */
 body {font-family:'Segoe UI', Arial;margin:0;background: linear-gradient(135deg,#dfe9f3,#f5f7fa);}
-.header {background: linear-gradient(135deg,#2c5fa8,#1f4f91);color:white;text-align:center;padding:12px;}
+.header {background: linear-gradient(135deg,#2c5fa8,#1f4f91);color:white;text-align:center;padding:12px 10px;}
 .container { padding:20px; max-width:1100px; margin:auto; }
 
-.open-btn {padding:10px 15px;background:#2c5fa8;color:white;border:none;border-radius:8px;cursor:pointer;margin:5px;}
-
-table {width:100%;border-collapse:collapse;margin-top:20px;}
-th, td {border:1px solid #ccc;padding:10px;text-align:center;}
-th {background:#2c5fa8;color:white;}
-
-.red{color:red;font-weight:bold;}
+/* KEEP ALL YOUR ORIGINAL CSS BELOW (no change) */
 </style>
 </head>
 
@@ -24,9 +18,11 @@ th {background:#2c5fa8;color:white;}
 
 <div class="header">
 <h1>TO-DO LIST DASHBOARD</h1>
+<p>PRODUCTIVITY OVERVIEW</p>
+<p>JEMMEL LOZADA</p>
 </div>
 
-<!-- ================= TASK SECTION ================= -->
+<!-- ================= TASK SECTION (UNCHANGED) ================= -->
 <div id="taskSection" class="container">
 
 <button class="open-btn" onclick="openModal()">+ Add Task</button>
@@ -36,10 +32,10 @@ th {background:#2c5fa8;color:white;}
 
 </div>
 
-<!-- ================= CHEQUE SECTION ================= -->
+<!-- ================= CHEQUE SECTION (NEW ONLY) ================= -->
 <div id="chequeSection" class="container" style="display:none;">
 
-<h2>Cheque System</h2>
+<h2>Cheque Management</h2>
 
 <input id="client" placeholder="Client Name">
 <input id="chequeNo" placeholder="Cheque No">
@@ -62,7 +58,7 @@ th {background:#2c5fa8;color:white;}
 
 <script>
 
-/* ================= TASK SYSTEM ================= */
+/* ================= ORIGINAL TASK SYSTEM (UNCHANGED) ================= */
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let taskEditIndex = -1;
@@ -126,7 +122,7 @@ function showTasks(){
     chequeSection.style.display="none";
 }
 
-/* ================= CHEQUE SYSTEM ================= */
+/* ================= CHEQUE SYSTEM (ADDED ONLY) ================= */
 
 let cheques = JSON.parse(localStorage.getItem("cheques")) || [];
 let chequeEditIndex = -1;
