@@ -150,6 +150,11 @@ tr:nth-child(even){ background:#f1f5fa; }
 <div id="chequeSection" class="container" style="display:none;">
 
 <h2>Cheque System</h2>
+    <div class="cards">
+<div class="card"><div class="card-header green">COLLECTED</div><div class="card-body" id="totalCollected">0</div></div>
+<div class="card"><div class="card-header orange">PENDING</div><div class="card-body" id="totalPending">0</div></div>
+<div class="card"><div class="card-header red">RETURNED</div><div class="card-body" id="totalReturned">0</div></div>
+</div>
     
     <select id="filterStatus" onchange="renderCheque()">
 <option value="All">All</option>
@@ -169,6 +174,7 @@ tr:nth-child(even){ background:#f1f5fa; }
 <option>Deposited</option>
 <option>Paid (Cash)</option>
 <option>Returned</option>
+<option>Cleared</option>
 </select>
 
 <button onclick="addCheque()">Save Cheque</button>
@@ -318,6 +324,16 @@ function addCheque(){
         due:chequeDue.value,
         status:chequeStatus.value
     };
+    if(chequeEditIndex !== -1){
+    if(!cheques[chequeEditIndex].history){
+        cheques[chequeEditIndex].history = [];
+    }
+
+    cheques[chequeEditIndex].history.push({
+        status: data.status,
+        date: new Date().toLocaleString()
+    });
+}
 
     if(!data.client) return alert("Enter client");
 
@@ -406,7 +422,18 @@ function deleteCheque(i){
         renderCheque();
     }
 }
+let collected = cheques.filter(c => c.status==="Cleared")
+.reduce((sum,c)=> sum + Number(c.amount || 0),0);
 
+let pending = cheques.filter(c => c.status==="Pending")
+.reduce((sum,c)=> sum + Number(c.amount || 0),0);
+
+let returned = cheques.filter(c => c.status==="Returned")
+.reduce((sum,c)=> sum + Number(c.amount || 0),0);
+
+document.getElementById("totalCollected").innerText = collected;
+document.getElementById("totalPending").innerText = pending;
+document.getElementById("totalReturned").innerText = returned;
 render();
 </script>
 
