@@ -100,6 +100,19 @@ tr:nth-child(even){ background:#f1f5fa; }
     padding:10px; background:#2c5fa8; color:white;
     border:none; border-radius:6px;
 }
+    /* ===== CHEQUE STATUS COLORS ===== */
+.status-badge{
+    padding:6px 10px;
+    border-radius:6px;
+    color:white;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.pending{background:#f39c12;}
+.deposited{background:#3498db;}
+.paid{background:#2ecc71;}
+.returned{background:#e74c3c;}
 </style>
 </head>
 
@@ -322,19 +335,31 @@ function renderCheque(){
             else if(diff<0) reminder="❌ Overdue";
         }
 
-        table.innerHTML+=`
-        <tr>
-        <td>${c.client}</td>
-        <td>${c.chequeNo}</td>
-        <td>${c.amount}</td>
-        <td>${c.due}</td>
-        <td>${c.status}</td>
-        <td class="${diff<=3?'red':''}">${reminder}</td>
-        <td>
-        <button onclick="editCheque(${i})">Edit</button>
-        <button onclick="deleteCheque(${i})">Delete</button>
-        </td>
-        </tr>`;
+       table.innerHTML+=`
+<tr>
+<td>${c.client}</td>
+<td>${c.chequeNo}</td>
+<td>${c.amount}</td>
+<td>${c.due}</td>
+
+<td>
+<span class="status-badge ${
+    c.status==="Pending" ? "pending" :
+    c.status==="Deposited" ? "deposited" :
+    c.status==="Paid (Cash)" ? "paid" :
+    "returned"
+}">
+${c.status}
+</span>
+</td>
+
+<td class="${diff<=3?'red':''}">${reminder}</td>
+
+<td>
+<button onclick="editCheque(${i})">Edit</button>
+<button onclick="deleteCheque(${i})">Delete</button>
+</td>
+</tr>`;
     });
 }
 
