@@ -164,7 +164,7 @@ Returned to Client: <span id="returnedClientCount">0</span>
 <option value="Pending">Pending</option>
 <option value="Paid (Cash)">Paid (Cash)</option>
 <option value="Deposited">Deposited</option>
-<option value="Returned">Returned</option>
+<option value="Bounced Cheque">Bounced Cheque</option>
 <option>Returned to Client</option>
 </select>
 
@@ -177,7 +177,7 @@ Returned to Client: <span id="returnedClientCount">0</span>
 <option>Pending</option>
 <option>Deposited</option>
 <option>Paid (Cash)</option>
-<option>Returned</option>
+<option>Bounced Cheque</option>
 <option>Cleared</option>
 <option>Returned to Client</option>
 </select>
@@ -414,7 +414,7 @@ function renderCheque(){
     let pending = cheques.filter(c => c.status==="Pending")
     .reduce((sum,c)=> sum + Number(c.amount || 0),0);
 
-    let returned = cheques.filter(c => c.status==="Returned")
+   let returned = cheques.filter(c => c.status==="Bounced Cheque")
     .reduce((sum,c)=> sum + Number(c.amount || 0),0);
 
     document.getElementById("totalCollected").innerText = collected;
@@ -449,7 +449,7 @@ let collected = cheques.filter(c => c.status==="Cleared")
 let pending = cheques.filter(c => c.status==="Pending")
 .reduce((sum,c)=> sum + Number(c.amount || 0),0);
 
-let returned = cheques.filter(c => c.status==="Returned")
+let returned = cheques.filter(c => c.status==="Bounced Cheque" ? "returned" :
 .reduce((sum,c)=> sum + Number(c.amount || 0),0);
 
 document.getElementById("totalCollected").innerText = collected;
