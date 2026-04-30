@@ -355,6 +355,7 @@ function addCheque(){
 }
 
 function renderCheque(){
+
     const table=document.getElementById("chequeTable");
     const filter = document.getElementById("filterStatus").value;
 
@@ -364,10 +365,11 @@ function renderCheque(){
 
     const today=new Date();
 
-   [...cheques]
-.sort((a,b)=> new Date(a.due) - new Date(b.due))
-.forEach((c)=>{
-    const realIndex = cheques.indexOf(c);
+    [...cheques]
+    .sort((a,b)=> new Date(a.due) - new Date(b.due))
+    .forEach((c)=>{
+        const realIndex = cheques.indexOf(c);
+
         if(filter !== "All" && c.status !== filter) return;
 
         const diff=Math.ceil((new Date(c.due)-today)/(1000*60*60*24));
@@ -393,7 +395,8 @@ function renderCheque(){
             c.status==="Deposited" ? "deposited" :
             c.status==="Paid (Cash)" ? "paid" :
             c.status==="Cleared" ? "paid" :
-           
+            c.status==="Bounced Cheque" ? "returned" :
+            "returned"
         }">
         ${c.status}
         </span>
@@ -401,21 +404,28 @@ function renderCheque(){
 
         <td>${reminder}</td>
         <td>
-       <button onclick="editCheque(${realIndex})">Edit</button>
-<button onclick="deleteCheque(${realIndex})">Delete</button>
+        <button onclick="editCheque(${realIndex})">Edit</button>
+        <button onclick="deleteCheque(${realIndex})">Delete</button>
         </td>
         </tr>`;
     });
+
+    let collected = cheques.filter(c => c.status==="Cleared")
+    .reduce((sum,c)=> sum + Number(c.amount || 0),0);
+
+    let pending = cheques.filter(c => c.status==="Pending")
+    .reduce((sum,c)=> sum + Number(c.amount || 0),0);
+
+    let returned = cheques.filter(c => c.status==="Bounced Cheque")
+    .reduce((sum,c)=> sum + Number(c.amount || 0),0);
 
     document.getElementById("totalCollected").innerText = collected;
     document.getElementById("totalPending").innerText = pending;
     document.getElementById("totalReturned").innerText = returned;
 
-    // returned to client count
     let returnedToClient = cheques.filter(c => c.status==="Returned to Client").length;
     document.getElementById("returnedClientCount").innerText = returnedToClient;
 }
-
 function editCheque(i){
     const c=cheques[i];
     client.value=c.client;
