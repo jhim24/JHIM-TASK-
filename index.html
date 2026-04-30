@@ -559,22 +559,25 @@ if(c.due){
         </tr>`;
     });
 
-    let collected = cheques.filter(c => c.status==="Cleared")
-    .reduce((sum,c)=> sum + Number(c.amount || 0),0);
+   // ✅ TOTAL PDC CHEQUES ONLY
+let totalPDC = cheques.filter(c => c.due).length;
 
-    let pending = cheques.filter(c => c.status==="Pending")
-    .reduce((sum,c)=> sum + Number(c.amount || 0),0);
+// ✅ PENDING (PDC ONLY)
+let pending = cheques.filter(c => c.due && c.status==="Pending")
+.reduce((sum,c)=> sum + Number(c.amount || 0),0);
 
-    let returned = cheques.filter(c => c.status==="Bounced Cheque")
-    .reduce((sum,c)=> sum + Number(c.amount || 0),0);
+// ✅ RETURNED (BOUNCED PDC)
+let returned = cheques.filter(c => c.due && c.status==="Bounced Cheque")
+.reduce((sum,c)=> sum + Number(c.amount || 0),0);
 
-    document.getElementById("totalCollected").innerText = collected;
-    document.getElementById("totalPending").innerText = pending;
-    document.getElementById("totalReturned").innerText = returned;
+// ✅ COLLECTED (OPTIONAL - PDC NA NA-CLEAR)
+let collected = cheques.filter(c => c.due && c.status==="Cleared")
+.reduce((sum,c)=> sum + Number(c.amount || 0),0);
 
-    let returnedToClient = cheques.filter(c => c.status==="Returned to Client").length;
-    document.getElementById("returnedClientCount").innerText = returnedToClient;
-}
+// DISPLAY
+document.getElementById("totalCollected").innerText = collected;
+document.getElementById("totalPending").innerText = pending;
+document.getElementById("totalReturned").innerText = returned;
 function editCheque(i){
     const c=cheques[i];
     client.value=c.client;
