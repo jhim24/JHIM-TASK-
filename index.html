@@ -171,6 +171,8 @@ Returned to Client: <span id="returnedClientCount">0</span>
 <option value="Deposited">Deposited</option>
 <option value="Bounced Cheque">Bounced Cheque</option>
 <option>Returned to Client</option>
+<select id="filterMonth" onchange="renderCheque()" style="margin-left:10px;">
+<option value="All">All Dates</option>
 </select>
 
 <input id="searchClient" placeholder="Search client..."
@@ -370,6 +372,7 @@ function addCheque(){
 
     saveCheque();
     renderCheque();
+populateMonthFilter();
 }
 
 function renderCheque(){
@@ -377,6 +380,7 @@ function renderCheque(){
     const table = document.getElementById("chequeTable");
     const filter = document.getElementById("filterStatus").value;
     const search = document.getElementById("searchClient").value.toLowerCase();
+    const monthFilter = document.getElementById("filterMonth").value;
 
     table.innerHTML = `<tr>
    <th>#</th>
@@ -398,6 +402,12 @@ function renderCheque(){
         const realIndex = cheques.indexOf(c);
 
         if(filter !== "All" && c.status !== filter) return;
+
+if(monthFilter !== "All"){
+    const d = new Date(c.due);
+    const key = d.getFullYear() + "-" + (d.getMonth()+1);
+    if(key !== monthFilter) return;
+}
         if(search && !c.client.toLowerCase().includes(search)) return;
 
         const diff = Math.ceil((new Date(c.due) - today)/(1000*60*60*24));
@@ -473,8 +483,36 @@ function deleteCheque(i){
         renderCheque();
     }
 }
-    renderCheque();
+    function populateMonthFilter(){
+
+    const select = document.getElementById("filterMonth");
+
+    select.innerHTML = '<option value="All">All Dates</option>';
+
+    const unique = [...new Set(
+        cheques.map(c => {
+            if(!c.due) return null;
+            const d = new Date(c.due);
+            return d.getFullYear() + "-" + (d.getMonth()+1);
+        })
+    )].filter(Boolean);
+
+    unique.sort((a,b)=> new Date(b) - new Date(a));
+
+    unique.forEach(val=>{
+        const [year,month] = val.split("-");
+        const date = new Date(year, month-1);
+
+        const option = document.createElement("option");
+        option.value = val;
+        option.text = date.toLocaleString('default',{month:'long'}) + " " + year;
+
+        select.appendChild(option);
+    });
+}
+   renderCheque();
 render();
+populateMonthFilter();
     
 </script>
 
