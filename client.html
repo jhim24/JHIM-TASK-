@@ -124,8 +124,13 @@ function renderClientSummary(){
             };
         }
 
-        summary[c.client].total++;
-        summary[c.client].amount += Number(c.amount || 0);
+       // TOTAL PDC ONLY
+if(c.due){
+    summary[c.client].total++;
+}
+       if(c.due){
+    summary[c.client].amount += Number(c.amount || 0);
+}
 
         if(c.status === "Deposited") summary[c.client].deposited++;
         if(c.status === "Pending") summary[c.client].pending++;
