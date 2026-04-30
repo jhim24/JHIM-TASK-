@@ -68,7 +68,13 @@ button{
 <div class="container">
 
 <button onclick="window.location.href='index.html'">⬅ Back to Cheques</button>
+<label>From:</label>
+<input type="date" id="fromDate">
 
+<label>To:</label>
+<input type="date" id="toDate">
+
+<button onclick="renderClientSummary()">Apply</button>
 <table id="clientTable"></table>
 
 </div>
@@ -81,21 +87,30 @@ function renderClientSummary(){
 
     const table = document.getElementById("clientTable");
 
+    const fromDate = document.getElementById("fromDate").value;
+    const toDate = document.getElementById("toDate").value;
+
     table.innerHTML = `
     <tr>
         <th>Client</th>
         <th>Total Cheques</th>
-        <th>Active (Office)</th>
+        <th>Active</th>
         <th>Total Amount</th>
         <th>Deposited</th>
         <th>Pending</th>
         <th>Paid Cash</th>
-        <th>Returned to Client</th>
+        <th>Returned</th>
     </tr>`;
 
     const summary = {};
 
     cheques.forEach(c => {
+
+        const due = new Date(c.due);
+
+        // ✅ FILTER BY DATE RANGE
+        if(fromDate && new Date(c.due) < new Date(fromDate)) return;
+        if(toDate && new Date(c.due) > new Date(toDate)) return;
 
         if(!summary[c.client]){
             summary[c.client] = {
@@ -109,23 +124,15 @@ function renderClientSummary(){
             };
         }
 
-        // ✅ TOTAL (ALL CHEQUES)
         summary[c.client].total++;
-
-        // ✅ TOTAL AMOUNT
         summary[c.client].amount += Number(c.amount || 0);
 
-        // ✅ STATUS COUNTS
         if(c.status === "Deposited") summary[c.client].deposited++;
         if(c.status === "Pending") summary[c.client].pending++;
         if(c.status === "Paid (Cash)") summary[c.client].cash++;
         if(c.status === "Returned to Client") summary[c.client].returned++;
 
-        // ✅ ACTIVE (NASA OFFICE LANG)
-        if(
-            c.status === "Pending" ||
-            c.status === "Bounced Cheque"
-        ){
+        if(c.status === "Pending" || c.status === "Bounced Cheque"){
             summary[c.client].active++;
         }
     });
@@ -147,7 +154,6 @@ function renderClientSummary(){
         </tr>`;
     }
 }
-
 renderClientSummary();
 
 </script>
