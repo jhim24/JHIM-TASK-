@@ -297,11 +297,15 @@ function addTask(){
 }
 
 function editTask(i){
-    document.getElementById("task").value=tasks[i].task;
-    editIndex=i;
+    document.getElementById("task").value = tasks[i].task;
+    document.getElementById("category").value = tasks[i].cat;
+    document.getElementById("priority").value = tasks[i].priority;
+    document.getElementById("status").value = tasks[i].status;
+    document.getElementById("due").value = tasks[i].due;
+
+    editIndex = i;
     openModal();
 }
-
 function del(i){ tasks.splice(i,1); save(); render(); }
 
 /* ===== TOGGLE ===== */
@@ -360,10 +364,10 @@ function renderCheque(){
 
     const today=new Date();
 
-    [...cheques]
-    .sort((a,b)=> new Date(a.due) - new Date(b.due))
-    .forEach((c,i)=>{
-
+   [...cheques]
+.sort((a,b)=> new Date(a.due) - new Date(b.due))
+.forEach((c)=>{
+    const realIndex = cheques.indexOf(c);
         if(filter !== "All" && c.status !== filter) return;
 
         const diff=Math.ceil((new Date(c.due)-today)/(1000*60*60*24));
@@ -397,8 +401,8 @@ function renderCheque(){
 
         <td>${reminder}</td>
         <td>
-        <button onclick="editCheque(${i})">Edit</button>
-        <button onclick="deleteCheque(${i})">Delete</button>
+       <button onclick="editCheque(${realIndex})">Edit</button>
+<button onclick="deleteCheque(${realIndex})">Delete</button>
         </td>
         </tr>`;
     });
