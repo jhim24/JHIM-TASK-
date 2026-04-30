@@ -407,16 +407,6 @@ function renderCheque(){
         </tr>`;
     });
 
-    // ✅ TOTALS UPDATE (FIXED)
-    let collected = cheques.filter(c => c.status==="Cleared")
-    .reduce((sum,c)=> sum + Number(c.amount || 0),0);
-
-    let pending = cheques.filter(c => c.status==="Pending")
-    .reduce((sum,c)=> sum + Number(c.amount || 0),0);
-
-   let returned = cheques.filter(c => c.status==="Bounced Cheque")
-    .reduce((sum,c)=> sum + Number(c.amount || 0),0);
-
     document.getElementById("totalCollected").innerText = collected;
     document.getElementById("totalPending").innerText = pending;
     document.getElementById("totalReturned").innerText = returned;
