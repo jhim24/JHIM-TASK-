@@ -59,7 +59,11 @@ table {
     background:linear-gradient(135deg,#ffffff,#f4f7fb);
     border-radius:10px; overflow:hidden;
 }
-th, td { border:1px solid #d6dee6; padding:12px; text-align:center; }
+th, td {
+    border:1px solid #d6dee6;
+    padding:14px 18px;
+    text-align:center;
+}
 th { background:#2c5fa8; color:white; }
 tr:nth-child(even){ background:#f1f5fa; }
 
@@ -539,8 +543,8 @@ if(c.due){
         <td>${reminder}</td>
 
         <td>
-        <button onclick="editCheque(${realIndex})">Edit</button>
-        <button onclick="deleteCheque(${realIndex})">Delete</button>
+        <button class="action-btn edit" onclick="editCheque(${realIndex})">Edit</button>
+<button class="action-btn delete" onclick="deleteCheque(${realIndex})">Delete</button>
         </td>
         </tr>`;
     });
