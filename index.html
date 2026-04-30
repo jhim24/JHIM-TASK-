@@ -154,20 +154,25 @@ tr:nth-child(even){ background:#f1f5fa; }
 
 </div>
 
-<!-- ================= CHEQUE SECTION (NEW) ================= -->
+<!-- ================= CHEQUE SECTION (FIXED) ================= -->
 <div id="chequeSection" class="container" style="display:none;">
 
 <h2>Cheque System</h2>
-    <div class="cards">
+
+<div class="cards">
 <div class="card"><div class="card-header green">COLLECTED</div><div class="card-body" id="totalCollected">0</div></div>
 <div class="card"><div class="card-header orange">PENDING</div><div class="card-body" id="totalPending">0</div></div>
 <div class="card"><div class="card-header red">RETURNED</div><div class="card-body" id="totalReturned">0</div></div>
 </div>
-    <div style="margin:10px 0; font-weight:bold;">
+
+<div style="margin:10px 0; font-weight:bold;">
 Returned to Client: <span id="returnedClientCount">0</span>
 </div>
-    
-   <select id="filterStatus" onchange="renderCheque()">
+
+<!-- FILTERS -->
+<div class="controls">
+
+<select id="filterStatus" onchange="renderCheque()">
 <option value="All">All</option>
 <option value="Pending">Pending</option>
 <option value="Paid (Cash)">Paid (Cash)</option>
@@ -176,13 +181,15 @@ Returned to Client: <span id="returnedClientCount">0</span>
 <option>Returned to Client</option>
 </select>
 
-<select id="filterMonth" onchange="renderCheque()" style="margin-left:10px;">
+<select id="filterMonth" onchange="renderCheque()">
 <option value="All">All Dates</option>
 </select>
 
-<input id="searchClient" placeholder="Search client..."
-onkeyup="renderCheque()" style="margin-left:10px;">
+<input id="searchClient" placeholder="Search client..." onkeyup="renderCheque()">
 
+</div>
+
+<!-- FORM -->
 <div class="controls">
 
 <input id="client" placeholder="Client Name">
@@ -203,22 +210,29 @@ onkeyup="renderCheque()" style="margin-left:10px;">
 <div class="controls">
 
 <div>
-<label>Due Date (PDC)</label><br>
+<label>Due Date (PDC)</label>
 <input id="chequeDue" type="date">
 </div>
 
 <div>
-<label>Transaction Date</label><br>
+<label>Transaction Date</label>
 <input id="transDate" type="date">
 </div>
 
 </div>
 
+<!-- BUTTONS -->
 <div style="margin-top:10px;">
 <button onclick="addCheque()">Save Cheque</button>
 <button onclick="showTasks()">⬅ Back</button>
 </div>
 
+<hr style="margin:20px 0;">
+
+<!-- TABLE -->
+<table id="chequeTable"></table>
+
+</div>
 <!-- ================= MODAL (UNCHANGED) ================= -->
 <div id="taskModal" class="modal">
 <div class="modal-content">
