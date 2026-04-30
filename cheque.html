@@ -55,6 +55,11 @@ th{
 <body>
 
 <h2>Cheque Management System</h2>
+    <div style="margin-bottom:15px; text-align:center;">
+<b>Total PDC:</b> <span id="totalPDC">0</span> |
+<b>Pending:</b> <span id="totalPending">0</span> |
+<b>Returned:</b> <span id="totalReturned">0</span>
+</div>
 
 <!-- FORM -->
 <input id="client" placeholder="Client Name">
@@ -158,6 +163,21 @@ function render(){
             <button onclick="deleteCheque(${i})">Delete</button>
         </td>
         </tr>
+        // ===== TOTAL BASED ON PDC ONLY =====
+
+// total PDC (may due date lang)
+let totalPDC = cheques.filter(c => c.due).length;
+
+// pending PDC
+let totalPending = cheques.filter(c => c.due && c.status==="Pending").length;
+
+// returned PDC
+let totalReturned = cheques.filter(c => c.due && c.status==="Returned").length;
+
+// display
+document.getElementById("totalPDC").innerText = totalPDC;
+document.getElementById("totalPending").innerText = totalPending;
+document.getElementById("totalReturned").innerText = totalReturned;
         `;
     });
 }
