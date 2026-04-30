@@ -85,6 +85,7 @@ function renderClientSummary(){
     <tr>
         <th>Client</th>
         <th>Total Cheques</th>
+        <th>Active (Office)</th>
         <th>Total Amount</th>
         <th>Deposited</th>
         <th>Pending</th>
@@ -99,6 +100,7 @@ function renderClientSummary(){
         if(!summary[c.client]){
             summary[c.client] = {
                 total: 0,
+                active: 0,
                 amount: 0,
                 deposited: 0,
                 pending: 0,
@@ -107,13 +109,25 @@ function renderClientSummary(){
             };
         }
 
+        // ✅ TOTAL (ALL CHEQUES)
         summary[c.client].total++;
+
+        // ✅ TOTAL AMOUNT
         summary[c.client].amount += Number(c.amount || 0);
 
+        // ✅ STATUS COUNTS
         if(c.status === "Deposited") summary[c.client].deposited++;
         if(c.status === "Pending") summary[c.client].pending++;
         if(c.status === "Paid (Cash)") summary[c.client].cash++;
         if(c.status === "Returned to Client") summary[c.client].returned++;
+
+        // ✅ ACTIVE (NASA OFFICE LANG)
+        if(
+            c.status === "Pending" ||
+            c.status === "Bounced Cheque"
+        ){
+            summary[c.client].active++;
+        }
     });
 
     for(let client in summary){
@@ -124,6 +138,7 @@ function renderClientSummary(){
         <tr>
             <td style="text-align:left;">${client}</td>
             <td>${s.total}</td>
+            <td>${s.active}</td>
             <td>${s.amount}</td>
             <td>${s.deposited}</td>
             <td>${s.pending}</td>
