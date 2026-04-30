@@ -54,7 +54,12 @@ th{
 
 <body>
 
+<button onclick="openCheque()">Open Cheque System</button>
+
+<div id="chequeBox" style="display:none;">
+
 <h2>Cheque Management System</h2>
+    
     <div style="margin-bottom:15px; text-align:center;">
 <b>Total PDC:</b> <span id="totalPDC">0</span> |
 <b>Pending:</b> <span id="totalPending">0</span> |
@@ -201,10 +206,12 @@ function deleteCheque(i){
         render();
     }
 }
-
+function openCheque(){
+    document.getElementById("chequeBox").style.display = "block";
+}
 render();
 
 </script>
-
+</div>
 </body>
 </html>
