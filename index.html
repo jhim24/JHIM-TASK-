@@ -238,14 +238,19 @@ Returned to Client: <span id="returnedClientCount">0</span>
 <div class="section-title">Filters</div>
 
 <div class="controls">
-<select id="filterStatus" onchange="renderCheque()">
-<option value="All">All</option>
-<option value="Pending">Pending</option>
-<option value="Paid (Cash)">Paid (Cash)</option>
-<option value="Deposited">Deposited</option>
-<option value="Bounced Cheque">Bounced Cheque</option>
-<option>Returned to Client</option>
-</select>
+<div id="statusFilter">
+
+<label><input type="checkbox" value="Pending" onchange="renderCheque()"> Pending</label>
+
+<label><input type="checkbox" value="Deposited" onchange="renderCheque()"> Deposited</label>
+
+<label><input type="checkbox" value="Paid (Cash)" onchange="renderCheque()"> Paid</label>
+
+<label><input type="checkbox" value="Bounced Cheque" onchange="renderCheque()"> Bounced</label>
+
+<label><input type="checkbox" value="Returned to Client" onchange="renderCheque()"> Returned</label>
+
+</div>
 
 <select id="filterMonth" onchange="renderCheque()">
 <option value="All">All Dates</option>
@@ -461,7 +466,8 @@ function addCheque(){
 function renderCheque(){
 
     const table = document.getElementById("chequeTable");
-    const filter = filterStatus.value;
+    const selectedStatus = [...document.querySelectorAll('#statusFilter input:checked')]
+.map(cb => cb.value);
     const search = searchClient.value.toLowerCase();
     const monthFilter = filterMonth.value;
 
@@ -486,7 +492,7 @@ function renderCheque(){
 
         const realIndex = cheques.indexOf(c);
 
-        if(filter!=="All" && c.status!==filter) return;
+        if(selectedStatus.length && !selectedStatus.includes(c.status)) return;
 
         if(monthFilter!=="All"){
             const d=new Date(c.due);
