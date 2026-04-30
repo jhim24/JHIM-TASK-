@@ -338,7 +338,9 @@ Returned to Client: <span id="returnedClientCount">0</span>
 
 <script>
 
-/* ===== ORIGINAL TASK SYSTEM ===== */
+<script>
+
+/* ===== TASK SYSTEM ===== */
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let editIndex = -1;
 
@@ -347,7 +349,6 @@ function openModal(){ taskModal.style.display="block"; }
 function closeModal(){ taskModal.style.display="none"; }
 
 function render(){
-
     const table = document.getElementById("table");
 
     table.innerHTML=`
@@ -374,50 +375,36 @@ function render(){
         </td>
         </tr>`;
     });
-
 }
-function addTask(){
 
-    const task = document.getElementById("task").value;
-    const category = document.getElementById("category").value;
-    const priority = document.getElementById("priority").value;
-    const status = document.getElementById("status").value;
-    const due = document.getElementById("due").value;
+function addTask(){
+    const task = task.value;
+    const category = category.value;
+    const priority = priority.value;
+    const status = status.value;
+    const due = due.value;
 
     if(!task) return alert("Enter task");
 
-    const newTask = {
-        task: task,
-        cat: category,
-        priority: priority,
-        status: status,
-        due: due
-    };
+    const newTask = { task, cat:category, priority, status, due };
 
-    if(editIndex === -1){
-        tasks.push(newTask);
-    } else {
-        tasks[editIndex] = newTask;
-        editIndex = -1;
-    }
+    if(editIndex === -1) tasks.push(newTask);
+    else { tasks[editIndex]=newTask; editIndex=-1; }
 
-    document.getElementById("task").value = "";
-
-    save();
-    render();
-    closeModal();
+    save(); render(); closeModal();
 }
 
 function editTask(i){
-    document.getElementById("task").value = tasks[i].task;
-    document.getElementById("category").value = tasks[i].cat;
-    document.getElementById("priority").value = tasks[i].priority;
-    document.getElementById("status").value = tasks[i].status;
-    document.getElementById("due").value = tasks[i].due;
-
-    editIndex = i;
+    const t = tasks[i];
+    task.value=t.task;
+    category.value=t.cat;
+    priority.value=t.priority;
+    status.value=t.status;
+    due.value=t.due;
+    editIndex=i;
     openModal();
 }
+
 function del(i){ tasks.splice(i,1); save(); render(); }
 
 /* ===== TOGGLE ===== */
@@ -426,165 +413,147 @@ function showCheque(){
     chequeSection.style.display="block";
     renderCheque();
 }
+
 function showTasks(){
     taskSection.style.display="block";
     chequeSection.style.display="none";
 }
 
-/* ===== CHEQUE SYSTEM (ADDED ONLY) ===== */
+/* ===== CHEQUE SYSTEM ===== */
 let cheques = JSON.parse(localStorage.getItem("cheques")) || [];
 let chequeEditIndex = -1;
 
-function saveCheque(){ localStorage.setItem("cheques", JSON.stringify(cheques)); }
+function saveCheque(){
+    localStorage.setItem("cheques", JSON.stringify(cheques));
+}
 
 function addCheque(){
 
     const data = {
-    client: client.value,
-    chequeNo: chequeNo.value,
-    amount: amount.value,
-    due: chequeDue.value,        // PDC
-    transDate: transDate.value,  // NEW
-    status: chequeStatus.value
-};
+        client: client.value,
+        chequeNo: chequeNo.value,
+        amount: amount.value,
+        due: chequeDue.value,
+        transDate: transDate.value,
+        status: chequeStatus.value
+    };
+
     if(!data.client) return alert("Enter client");
 
     if(chequeEditIndex !== -1){
-
-        if(!cheques[chequeEditIndex].history){
-            cheques[chequeEditIndex].history = [];
-        }
-
-        cheques[chequeEditIndex].history.push({
-            status: data.status,
-            date: new Date().toLocaleString()
-        });
-
         cheques[chequeEditIndex] = data;
         chequeEditIndex = -1;
-
     } else {
         cheques.push(data);
     }
 
-    client.value = "";
-    chequeNo.value = "";
-    amount.value = "";
-    chequeDue.value = "";
-    transDate.value = "";
+    client.value="";
+    chequeNo.value="";
+    amount.value="";
+    chequeDue.value="";
+    transDate.value="";
 
     saveCheque();
     renderCheque();
-populateMonthFilter();
+    populateMonthFilter();
 }
 
 function renderCheque(){
 
     const table = document.getElementById("chequeTable");
-    const filter = document.getElementById("filterStatus").value;
-    const search = document.getElementById("searchClient").value.toLowerCase();
-    const monthFilter = document.getElementById("filterMonth").value;
+    const filter = filterStatus.value;
+    const search = searchClient.value.toLowerCase();
+    const monthFilter = filterMonth.value;
 
-    table.innerHTML = `<tr>
-   <th>#</th>
-<th>Client</th>
-<th>Cheque</th>
-<th>Amount</th>
-<th>Due (PDC)</th>
-<th>Transaction Date</th>
-<th>Status</th>
-<th>Reminder</th>
-<th>Action</th>
+    table.innerHTML=`<tr>
+    <th>#</th>
+    <th>Client</th>
+    <th>Cheque</th>
+    <th>Amount</th>
+    <th>Due (PDC)</th>
+    <th>Transaction</th>
+    <th>Status</th>
+    <th>Reminder</th>
+    <th>Action</th>
     </tr>`;
 
     const today = new Date();
 
     [...cheques]
-    .sort((a,b)=> new Date(a.due) - new Date(b.due))
+    .sort((a,b)=> new Date(a.due||0) - new Date(b.due||0))
     .forEach((c,index)=>{
 
         const realIndex = cheques.indexOf(c);
 
-        if(filter !== "All" && c.status !== filter) return;
+        if(filter!=="All" && c.status!==filter) return;
 
-if(monthFilter !== "All"){
-    const d = new Date(c.due);
-    const key = d.getFullYear() + "-" + (d.getMonth()+1);
-    if(key !== monthFilter) return;
-}
-        if(search && !c.client.toLowerCase().includes(search)) return;
-
-        let diff = 0;
-
-if(c.due){
-    diff = Math.ceil((new Date(c.due) - today)/(1000*60*60*24));
-}
-
-        let reminder = "";
-        if(c.status === "Pending"){
-            if(diff > 1) reminder = "Due in " + diff + " days";
-            else if(diff === 1) reminder = "Due tomorrow";
-            else if(diff === 0) reminder = "Due today";
-            else reminder = "Overdue";
+        if(monthFilter!=="All"){
+            const d=new Date(c.due);
+            const key=d.getFullYear()+"-"+(d.getMonth()+1);
+            if(key!==monthFilter) return;
         }
 
-        table.innerHTML += `
-        <tr class="${diff < 0 && c.status==='Pending' ? 'overdue-row' : ''}">
-        <td>${index + 1}</td>
-<td>${c.client}</td>
+        if(search && !c.client.toLowerCase().includes(search)) return;
+
+        let diff=0;
+        if(c.due){
+            diff=Math.ceil((new Date(c.due)-today)/(1000*60*60*24));
+        }
+
+        let reminder="";
+        if(c.status==="Pending"){
+            if(diff>1) reminder="Due in "+diff+" days";
+            else if(diff===1) reminder="Due tomorrow";
+            else if(diff===0) reminder="Due today";
+            else reminder="Overdue";
+        }
+
+        table.innerHTML+=`
+        <tr class="${diff<0 && c.status==='Pending' ? 'overdue-row':''}">
+        <td>${index+1}</td>
+        <td>${c.client}</td>
         <td>${c.chequeNo}</td>
         <td>${c.amount}</td>
-        <td>${c.due || "-"}</td>
-<td>${c.transDate || "-"}</td>
-
+        <td>${c.due||"-"}</td>
+        <td>${c.transDate||"-"}</td>
         <td>
         <span class="status-badge ${
-            c.status==="Pending" ? "pending" :
-            c.status==="Deposited" ? "deposited" :
-            c.status==="Paid (Cash)" ? "paid" :
-            c.status==="Cleared" ? "paid" :
-            c.status==="Bounced Cheque" ? "returned" :
+            c.status==="Pending"?"pending":
+            c.status==="Deposited"?"deposited":
+            c.status==="Paid (Cash)"||c.status==="Cleared"?"paid":
             "returned"
-        }">
-        ${c.status}
-        </span>
+        }">${c.status}</span>
         </td>
-
         <td>${reminder}</td>
-
         <td>
         <button class="action-btn edit" onclick="editCheque(${realIndex})">Edit</button>
-<button class="action-btn delete" onclick="deleteCheque(${realIndex})">Delete</button>
+        <button class="action-btn delete" onclick="deleteCheque(${realIndex})">Delete</button>
         </td>
         </tr>`;
     });
 
-   // ✅ TOTAL PDC CHEQUES ONLY
-let totalPDC = cheques.filter(c => c.due).length;
+    // TOTAL (PDC only)
+    let pending = cheques.filter(c=>c.due && c.status==="Pending")
+    .reduce((s,c)=>s+Number(c.amount||0),0);
 
-// ✅ PENDING (PDC ONLY)
-let pending = cheques.filter(c => c.due && c.status==="Pending")
-.reduce((sum,c)=> sum + Number(c.amount || 0),0);
+    let returned = cheques.filter(c=>c.due && c.status==="Bounced Cheque")
+    .reduce((s,c)=>s+Number(c.amount||0),0);
 
-// ✅ RETURNED (BOUNCED PDC)
-let returned = cheques.filter(c => c.due && c.status==="Bounced Cheque")
-.reduce((sum,c)=> sum + Number(c.amount || 0),0);
+    let collected = cheques.filter(c=>c.due && c.status==="Cleared")
+    .reduce((s,c)=>s+Number(c.amount||0),0);
 
-// ✅ COLLECTED (OPTIONAL - PDC NA NA-CLEAR)
-let collected = cheques.filter(c => c.due && c.status==="Cleared")
-.reduce((sum,c)=> sum + Number(c.amount || 0),0);
+    totalCollected.innerText=collected;
+    totalPending.innerText=pending;
+    totalReturned.innerText=returned;
+}
 
-// DISPLAY
-document.getElementById("totalCollected").innerText = collected;
-document.getElementById("totalPending").innerText = pending;
-document.getElementById("totalReturned").innerText = returned;
 function editCheque(i){
     const c=cheques[i];
     client.value=c.client;
     chequeNo.value=c.chequeNo;
     amount.value=c.amount;
     chequeDue.value=c.due;
-    transDate.value = c.transDate || "";
+    transDate.value=c.transDate||"";
     chequeStatus.value=c.status;
     chequeEditIndex=i;
 }
@@ -596,36 +565,39 @@ function deleteCheque(i){
         renderCheque();
     }
 }
-    function populateMonthFilter(){
 
-    const select = document.getElementById("filterMonth");
+function populateMonthFilter(){
 
-    select.innerHTML = '<option value="All">All Dates</option>';
+    filterMonth.innerHTML='<option value="All">All Dates</option>';
 
-    const unique = [...new Set(
-        cheques.map(c => {
+    const unique=[...new Set(
+        cheques.map(c=>{
             if(!c.due) return null;
-            const d = new Date(c.due);
-            return d.getFullYear() + "-" + (d.getMonth()+1);
+            const d=new Date(c.due);
+            return d.getFullYear()+"-"+(d.getMonth()+1);
         })
     )].filter(Boolean);
 
-    unique.sort((a,b)=> new Date(b) - new Date(a));
+    unique.sort((a,b)=> new Date(b)-new Date(a));
 
     unique.forEach(val=>{
-        const [year,month] = val.split("-");
-        const date = new Date(year, month-1);
+        const [year,month]=val.split("-");
+        const date=new Date(year,month-1);
 
-        const option = document.createElement("option");
-        option.value = val;
-        option.text = date.toLocaleString('default',{month:'long'}) + " " + year;
+        const opt=document.createElement("option");
+        opt.value=val;
+        opt.text=date.toLocaleString('default',{month:'long'})+" "+year;
 
-        select.appendChild(option);
+        filterMonth.appendChild(opt);
     });
 }
-   renderCheque();
+
+/* INIT */
 render();
+renderCheque();
 populateMonthFilter();
+
+</script>
     
 </script>
 
