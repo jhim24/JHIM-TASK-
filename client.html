@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Client Summary</title>
+
+<style>
+body{
+    font-family:Segoe UI;
+    margin:0;
+    background:linear-gradient(135deg,#dfe9f3,#f5f7fa);
+}
+
+.header{
+    background:#2c5fa8;
+    color:white;
+    text-align:center;
+    padding:15px;
+}
+
+.container{
+    padding:20px;
+    max-width:1000px;
+    margin:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+th,td{
+    padding:12px;
+    border:1px solid #ddd;
+    text-align:center;
+}
+
+th{
+    background:#2c5fa8;
+    color:white;
+}
+
+tr:nth-child(even){
+    background:#f5f7fa;
+}
+
+button{
+    padding:10px 15px;
+    background:#2c5fa8;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h2>CLIENT SUMMARY</h2>
+</div>
+
+<div class="container">
+
+<button onclick="window.location.href='index.html'">⬅ Back to Cheques</button>
+
+<table id="clientTable"></table>
+
+</div>
+
+<script>
+
+let cheques = JSON.parse(localStorage.getItem("cheques")) || [];
+
+function renderClientSummary(){
+
+    const table = document.getElementById("clientTable");
+
+    table.innerHTML = `
+    <tr>
+        <th>Client</th>
+        <th>Total Cheques</th>
+        <th>Total Amount</th>
+        <th>Deposited</th>
+        <th>Pending</th>
+        <th>Paid Cash</th>
+        <th>Returned to Client</th>
+    </tr>`;
+
+    const summary = {};
+
+    cheques.forEach(c => {
+
+        if(!summary[c.client]){
+            summary[c.client] = {
+                total: 0,
+                amount: 0,
+                deposited: 0,
+                pending: 0,
+                cash: 0,
+                returned: 0
+            };
+        }
+
+        summary[c.client].total++;
+        summary[c.client].amount += Number(c.amount || 0);
+
+        if(c.status === "Deposited") summary[c.client].deposited++;
+        if(c.status === "Pending") summary[c.client].pending++;
+        if(c.status === "Paid (Cash)") summary[c.client].cash++;
+        if(c.status === "Returned to Client") summary[c.client].returned++;
+    });
+
+    for(let client in summary){
+
+        const s = summary[client];
+
+        table.innerHTML += `
+        <tr>
+            <td style="text-align:left;">${client}</td>
+            <td>${s.total}</td>
+            <td>${s.amount}</td>
+            <td>${s.deposited}</td>
+            <td>${s.pending}</td>
+            <td>${s.cash}</td>
+            <td>${s.returned}</td>
+        </tr>`;
+    }
+}
+
+renderClientSummary();
+
+</script>
+
+</body>
+</html>
