@@ -186,7 +186,11 @@ onkeyup="renderCheque()" style="margin-left:10px;">
 <input id="client" placeholder="Client Name">
 <input id="chequeNo" placeholder="Cheque No">
 <input id="amount" type="number" placeholder="Amount">
+<label>Due Date (PDC)</label>
 <input id="chequeDue" type="date">
+
+<label>Transaction Date</label>
+<input id="transDate" type="date">
 
 <select id="chequeStatus">
 <option>Pending</option>
@@ -343,13 +347,13 @@ function saveCheque(){ localStorage.setItem("cheques", JSON.stringify(cheques));
 function addCheque(){
 
     const data = {
-        client: client.value,
-        chequeNo: chequeNo.value,
-        amount: amount.value,
-        due: chequeDue.value,
-        status: chequeStatus.value
-    };
-
+    client: client.value,
+    chequeNo: chequeNo.value,
+    amount: amount.value,
+    due: chequeDue.value,        // PDC
+    transDate: transDate.value,  // NEW
+    status: chequeStatus.value
+};
     if(!data.client) return alert("Enter client");
 
     if(chequeEditIndex !== -1){
@@ -374,6 +378,7 @@ function addCheque(){
     chequeNo.value = "";
     amount.value = "";
     chequeDue.value = "";
+    transDate.value = "";
 
     saveCheque();
     renderCheque();
@@ -392,7 +397,8 @@ function renderCheque(){
 <th>Client</th>
 <th>Cheque</th>
 <th>Amount</th>
-<th>Due</th>
+<th>Due (PDC)</th>
+<th>Transaction Date</th>
 <th>Status</th>
 <th>Reminder</th>
 <th>Action</th>
@@ -415,7 +421,11 @@ if(monthFilter !== "All"){
 }
         if(search && !c.client.toLowerCase().includes(search)) return;
 
-        const diff = Math.ceil((new Date(c.due) - today)/(1000*60*60*24));
+        let diff = 0;
+
+if(c.due){
+    diff = Math.ceil((new Date(c.due) - today)/(1000*60*60*24));
+}
 
         let reminder = "";
         if(c.status === "Pending"){
@@ -431,7 +441,8 @@ if(monthFilter !== "All"){
 <td>${c.client}</td>
         <td>${c.chequeNo}</td>
         <td>${c.amount}</td>
-        <td>${c.due}</td>
+        <td>${c.due || "-"}</td>
+<td>${c.transDate || "-"}</td>
 
         <td>
         <span class="status-badge ${
@@ -477,6 +488,7 @@ function editCheque(i){
     chequeNo.value=c.chequeNo;
     amount.value=c.amount;
     chequeDue.value=c.due;
+    transDate.value = c.transDate || "";
     chequeStatus.value=c.status;
     chequeEditIndex=i;
 }
