@@ -334,27 +334,42 @@ let chequeEditIndex = -1;
 function saveCheque(){ localStorage.setItem("cheques", JSON.stringify(cheques)); }
 
 function addCheque(){
-  
-};
-    if(chequeEditIndex !== -1){
-    if(!cheques[chequeEditIndex].history){
-        cheques[chequeEditIndex].history = [];
-    }
 
-    cheques[chequeEditIndex].history.push({
-        status: data.status,
-        date: new Date().toLocaleString()
-    });
-}
+    const data = {
+        client: client.value,
+        chequeNo: chequeNo.value,
+        amount: amount.value,
+        due: chequeDue.value,
+        status: chequeStatus.value
+    };
 
     if(!data.client) return alert("Enter client");
 
-    if(chequeEditIndex===-1) cheques.push(data);
-    else { cheques[chequeEditIndex]=data; chequeEditIndex=-1; }
+    if(chequeEditIndex !== -1){
 
-    client.value=""; chequeNo.value=""; amount.value=""; chequeDue.value="";
+        if(!cheques[chequeEditIndex].history){
+            cheques[chequeEditIndex].history = [];
+        }
 
-    saveCheque(); renderCheque();
+        cheques[chequeEditIndex].history.push({
+            status: data.status,
+            date: new Date().toLocaleString()
+        });
+
+        cheques[chequeEditIndex] = data;
+        chequeEditIndex = -1;
+
+    } else {
+        cheques.push(data);
+    }
+
+    client.value = "";
+    chequeNo.value = "";
+    amount.value = "";
+    chequeDue.value = "";
+
+    saveCheque();
+    renderCheque();
 }
 
 function renderCheque(){
@@ -458,8 +473,9 @@ function deleteCheque(i){
         renderCheque();
     }
 }
-    
+    renderCheque();
 render();
+    
 </script>
 
 </body>
