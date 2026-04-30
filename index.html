@@ -356,34 +356,43 @@ function addCheque(){
 
 function renderCheque(){
 
-    const table=document.getElementById("chequeTable");
+    const table = document.getElementById("chequeTable");
     const filter = document.getElementById("filterStatus").value;
 
-    table.innerHTML=`<tr>
-    <th>Client</th><th>Cheque</th><th>Amount</th>
-    <th>Due</th><th>Status</th><th>Reminder</th><th>Action</th></tr>`;
+    table.innerHTML = `<tr>
+    <th>#</th>
+    <th>Client</th>
+    <th>Cheque</th>
+    <th>Amount</th>
+    <th>Due</th>
+    <th>Status</th>
+    <th>Reminder</th>
+    <th>Action</th>
+    </tr>`;
 
-    const today=new Date();
+    const today = new Date();
 
     [...cheques]
     .sort((a,b)=> new Date(a.due) - new Date(b.due))
-    .forEach((c)=>{
+    .forEach((c,index)=>{
+
         const realIndex = cheques.indexOf(c);
 
         if(filter !== "All" && c.status !== filter) return;
 
-        const diff=Math.ceil((new Date(c.due)-today)/(1000*60*60*24));
+        const diff = Math.ceil((new Date(c.due) - today)/(1000*60*60*24));
 
-        let reminder="";
-        if(c.status==="Pending"){
+        let reminder = "";
+        if(c.status === "Pending"){
             if(diff > 1) reminder = "Due in " + diff + " days";
             else if(diff === 1) reminder = "Due tomorrow";
             else if(diff === 0) reminder = "Due today";
             else reminder = "Overdue";
         }
 
-        table.innerHTML+=`
+        table.innerHTML += `
         <tr class="${diff < 0 && c.status==='Pending' ? 'overdue-row' : ''}">
+        <td>${index + 1}</td>
         <td>${c.client}</td>
         <td>${c.chequeNo}</td>
         <td>${c.amount}</td>
@@ -403,6 +412,7 @@ function renderCheque(){
         </td>
 
         <td>${reminder}</td>
+
         <td>
         <button onclick="editCheque(${realIndex})">Edit</button>
         <button onclick="deleteCheque(${realIndex})">Delete</button>
@@ -410,6 +420,7 @@ function renderCheque(){
         </tr>`;
     });
 
+    // ===== TOTALS =====
     let collected = cheques.filter(c => c.status==="Cleared")
     .reduce((sum,c)=> sum + Number(c.amount || 0),0);
 
@@ -423,6 +434,7 @@ function renderCheque(){
     document.getElementById("totalPending").innerText = pending;
     document.getElementById("totalReturned").innerText = returned;
 
+    // ===== RETURNED TO CLIENT COUNT =====
     let returnedToClient = cheques.filter(c => c.status==="Returned to Client").length;
     document.getElementById("returnedClientCount").innerText = returnedToClient;
 }
