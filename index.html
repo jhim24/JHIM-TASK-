@@ -164,16 +164,17 @@ tr:nth-child(even){ background:#f1f5fa; }
 Returned to Client: <span id="returnedClientCount">0</span>
 </div>
     
-    <select id="filterStatus" onchange="renderCheque()">
+   <select id="filterStatus" onchange="renderCheque()">
 <option value="All">All</option>
 <option value="Pending">Pending</option>
 <option value="Paid (Cash)">Paid (Cash)</option>
 <option value="Deposited">Deposited</option>
 <option value="Bounced Cheque">Bounced Cheque</option>
 <option>Returned to Client</option>
+</select>
+
 <input id="searchClient" placeholder="Search client..."
 onkeyup="renderCheque()" style="margin-left:10px;">
-</select>
 
 <input id="client" placeholder="Client Name">
 <input id="chequeNo" placeholder="Cheque No">
@@ -370,6 +371,7 @@ function renderCheque(){
 
     table.innerHTML = `<tr>
     <th>#</th>
+    <th>Date & Time</th>
     <th>Client</th>
     <th>Cheque</th>
     <th>Amount</th>
@@ -377,9 +379,6 @@ function renderCheque(){
     <th>Status</th>
     <th>Reminder</th>
     <th>Action</th>
-    <th>#</th>
-<th>Date & Time</th>
-<th>Client</th>
     </tr>`;
 
     const today = new Date();
@@ -391,8 +390,7 @@ function renderCheque(){
         const realIndex = cheques.indexOf(c);
 
         if(filter !== "All" && c.status !== filter) return;
-
-if(search && !c.client.toLowerCase().includes(search)) return;
+        if(search && !c.client.toLowerCase().includes(search)) return;
 
         const diff = Math.ceil((new Date(c.due) - today)/(1000*60*60*24));
 
@@ -406,9 +404,9 @@ if(search && !c.client.toLowerCase().includes(search)) return;
 
         table.innerHTML += `
         <tr class="${diff < 0 && c.status==='Pending' ? 'overdue-row' : ''}">
-       <td>${index + 1}</td>
-<td>${c.created || "-"}</td>
-<td>${c.client}</td>
+        <td>${index + 1}</td>
+        <td>${c.created || "-"}</td>
+        <td>${c.client}</td>
         <td>${c.chequeNo}</td>
         <td>${c.amount}</td>
         <td>${c.due}</td>
@@ -435,7 +433,6 @@ if(search && !c.client.toLowerCase().includes(search)) return;
         </tr>`;
     });
 
-    // ===== TOTALS =====
     let collected = cheques.filter(c => c.status==="Cleared")
     .reduce((sum,c)=> sum + Number(c.amount || 0),0);
 
@@ -449,7 +446,6 @@ if(search && !c.client.toLowerCase().includes(search)) return;
     document.getElementById("totalPending").innerText = pending;
     document.getElementById("totalReturned").innerText = returned;
 
-    // ===== RETURNED TO CLIENT COUNT =====
     let returnedToClient = cheques.filter(c => c.status==="Returned to Client").length;
     document.getElementById("returnedClientCount").innerText = returnedToClient;
 }
@@ -470,10 +466,7 @@ function deleteCheque(i){
         renderCheque();
     }
 }
-
-document.getElementById("totalCollected").innerText = collected;
-document.getElementById("totalPending").innerText = pending;
-document.getElementById("totalReturned").innerText = returned;
+    
 render();
 </script>
 
