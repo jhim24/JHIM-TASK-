@@ -263,6 +263,7 @@ Returned to Client: <span id="returnedClientCount">0</span>
 <input id="client" placeholder="Client Name">
 <input id="chequeNo" placeholder="Cheque No">
 <input id="amount" type="number" placeholder="Amount">
+<input id="narration" placeholder="Narration (e.g. Payment for invoice #123)">
 
 <select id="chequeStatus">
 <option>Pending</option>
@@ -428,14 +429,14 @@ function saveCheque(){
 function addCheque(){
 
     const data = {
-        client: client.value,
-        chequeNo: chequeNo.value,
-        amount: amount.value,
-        due: chequeDue.value,
-        transDate: transDate.value,
-        status: chequeStatus.value
-    };
-
+    client: client.value,
+    chequeNo: chequeNo.value,
+    amount: amount.value,
+    due: chequeDue.value,
+    transDate: transDate.value,
+    status: chequeStatus.value,
+    narration: narration.value || ""
+};
     if(!data.client) return alert("Enter client");
 
     if(chequeEditIndex !== -1){
@@ -450,6 +451,7 @@ function addCheque(){
     amount.value="";
     chequeDue.value="";
     transDate.value="";
+    narration.value="";
 
     saveCheque();
     renderCheque();
@@ -473,6 +475,7 @@ function renderCheque(){
     <th>Status</th>
     <th>Reminder</th>
     <th>Action</th>
+<th>Narration</th>
     </tr>`;
 
     const today = new Date();
@@ -523,11 +526,15 @@ function renderCheque(){
         }">${c.status}</span>
         </td>
         <td>${reminder}</td>
-        <td>
-        <button class="action-btn edit" onclick="editCheque(${realIndex})">Edit</button>
-        <button class="action-btn delete" onclick="deleteCheque(${realIndex})">Delete</button>
-        </td>
-        </tr>`;
+       <td>
+<button class="action-btn edit" onclick="editCheque(${realIndex})">Edit</button>
+<button class="action-btn delete" onclick="deleteCheque(${realIndex})">Delete</button>
+</td>
+
+<td style="text-align:left;">${c.narration || "-"}</td>
+
+</tr>`;
+
     });
 
     // TOTAL (PDC only)
@@ -554,6 +561,7 @@ function editCheque(i){
     transDate.value=c.transDate||"";
     chequeStatus.value=c.status;
     chequeEditIndex=i;
+    narration.value = c.narration || "";
 }
 
 function deleteCheque(i){
