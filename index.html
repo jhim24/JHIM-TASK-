@@ -640,9 +640,9 @@ function populateMonthFilter(){
 
 /* INIT */
 render();
-loadCheques();
+await loadCheques();
 populateMonthFilter();
-async function loadCheques(){
+renderCheque();
     
     const querySnapshot = await getDocs(collection(db, "cheques"));
     cheques = [];
@@ -686,6 +686,15 @@ window.deleteCheque = deleteCheque;
 window.addTask = addTask;
 window.editTask = editTask;
 window.del = del;
+    // AUTO FILTER FIX
+document.querySelectorAll('#statusFilter input').forEach(cb=>{
+    cb.addEventListener("change", () => {
+        renderCheque();
+    });
+});
+
+document.getElementById("searchClient").addEventListener("keyup", renderCheque);
+document.getElementById("filterMonth").addEventListener("change", renderCheque);
 </script>
     
 </body>
