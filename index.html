@@ -397,22 +397,29 @@ function render(){
 }
 
 function addTask(){
-    const task = task.value;
-    const category = category.value;
-    const priority = priority.value;
-    const status = status.value;
-    const due = due.value;
+    const taskVal = document.getElementById("task").value;
+    const categoryVal = document.getElementById("category").value;
+    const priorityVal = document.getElementById("priority").value;
+    const statusVal = document.getElementById("status").value;
+    const dueVal = document.getElementById("due").value;
 
-    if(!task) return alert("Enter task");
+    if(!taskVal) return alert("Enter task");
 
-    const newTask = { task, cat:category, priority, status, due };
+    const newTask = {
+        task: taskVal,
+        cat: categoryVal,
+        priority: priorityVal,
+        status: statusVal,
+        due: dueVal
+    };
 
     if(editIndex === -1) tasks.push(newTask);
     else { tasks[editIndex]=newTask; editIndex=-1; }
 
-    save(); render(); closeModal();
+    save();
+    render();
+    closeModal();
 }
-
 function editTask(i){
     const t = tasks[i];
     task.value=t.task;
@@ -439,7 +446,7 @@ function showTasks(){
 }
 
 /* ===== CHEQUE SYSTEM ===== */
-let cheques = JSON.parse(localStorage.getItem("cheques")) || [];
+let cheques = [];
 let chequeEditIndex = -1;
 
 function saveCheque(){
@@ -459,12 +466,13 @@ async function addCheque(){
 };
     if(!data.client) return alert("Enter client");
 
-    if(chequeEditIndex !== -1){
-        cheques[chequeEditIndex] = data;
-        chequeEditIndex = -1;
-    } else {
-        await addDoc(collection(db, "cheques"), data);
-    }
+   if(chequeEditIndex !== -1){
+    await deleteDoc(doc(db, "cheques", cheques[chequeEditIndex].id));
+    await addDoc(collection(db, "cheques"), data);
+    chequeEditIndex = -1;
+} else {
+    await addDoc(collection(db, "cheques"), data);
+}
 
     client.value="";
     chequeNo.value="";
@@ -473,9 +481,8 @@ async function addCheque(){
     transDate.value="";
     narration.value="";
 
-    saveCheque();
-    renderCheque();
-    populateMonthFilter();
+    await loadCheques();
+populateMonthFilter();
 }
 
 function renderCheque(){
@@ -594,8 +601,7 @@ async function deleteCheque(i){
     if(confirm("Delete?")){
        await deleteDoc(doc(db, "cheques", cheques[i].id));
 loadCheques();
-        saveCheque();
-        renderCheque();
+        loadCheques();
     }
 }
 
@@ -627,7 +633,7 @@ function populateMonthFilter(){
 
 /* INIT */
 render();
-renderCheque();
+loadCheques();
 populateMonthFilter();
 async function loadCheques(){
     const querySnapshot = await getDocs(collection(db, "cheques"));
