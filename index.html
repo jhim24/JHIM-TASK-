@@ -494,7 +494,7 @@ function renderCheque(){
 
     const table = document.getElementById("chequeTable");
     const selectedStatus = [...document.querySelectorAll('#statusFilter input:checked')]
-.map(cb => cb.value.trim());
+.map(cb => cb.value.toLowerCase().trim());
     const search = searchClient.value.toLowerCase();
     const monthFilter = filterMonth.value;
 
@@ -519,7 +519,7 @@ function renderCheque(){
 
         const realIndex = cheques.indexOf(c);
 
-       if(selectedStatus.length > 0 && !selectedStatus.includes((c.status || "").trim())) return;
+       if(selectedStatus.length > 0 && !selectedStatus.includes((c.status || "").toLowerCase().trim())) return;
 
         if(monthFilter!=="All"){
             const d=new Date(c.due);
@@ -527,7 +527,7 @@ function renderCheque(){
             if(key!==monthFilter) return;
         }
 
-        if(search && !c.client.toLowerCase().includes(search)) return;
+       if(search && !(c.client || "").toLowerCase().includes(search)) return;
 
         let diff=0;
         if(c.due){
@@ -605,8 +605,7 @@ function editCheque(i){
 async function deleteCheque(i){
     if(confirm("Delete?")){
        await deleteDoc(doc(db, "cheques", cheques[i].id));
-loadCheques();
-       await loadCheques();
+await loadCheques();
 
 // 👉 UPDATE BACKUP
 localStorage.setItem("cheques", JSON.stringify(cheques));
