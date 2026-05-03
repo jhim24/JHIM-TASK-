@@ -447,7 +447,7 @@ function showTasks(){
 }
 
 /* ===== CHEQUE SYSTEM ===== */
-let cheques = [];
+let cheques = JSON.parse(localStorage.getItem("cheques")) || [];
 let chequeEditIndex = -1;
 
 function saveCheque(){
@@ -483,6 +483,10 @@ async function addCheque(){
     narration.value="";
 
     await loadCheques();
+
+// 👉 BACKUP SAVE
+localStorage.setItem("cheques", JSON.stringify(cheques));
+
 populateMonthFilter();
 }
 
@@ -602,7 +606,10 @@ async function deleteCheque(i){
     if(confirm("Delete?")){
        await deleteDoc(doc(db, "cheques", cheques[i].id));
 loadCheques();
-        loadCheques();
+       await loadCheques();
+
+// 👉 UPDATE BACKUP
+localStorage.setItem("cheques", JSON.stringify(cheques));
     }
 }
 
@@ -647,6 +654,8 @@ async function loadCheques(){
 
     renderCheque();
 }
+    // 👉 SAVE BACKUP AFTER LOAD
+localStorage.setItem("cheques", JSON.stringify(cheques));
     async function migrateLocalToFirebase(){
 
     const localData = JSON.parse(localStorage.getItem("cheques")) || [];
