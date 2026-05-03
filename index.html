@@ -494,7 +494,7 @@ function renderCheque(){
 
     const table = document.getElementById("chequeTable");
     const selectedStatus = [...document.querySelectorAll('#statusFilter input:checked')]
-.map(cb => cb.value);
+.map(cb => cb.value.trim());
     const search = searchClient.value.toLowerCase();
     const monthFilter = filterMonth.value;
 
@@ -519,7 +519,7 @@ function renderCheque(){
 
         const realIndex = cheques.indexOf(c);
 
-        if(selectedStatus.length && !selectedStatus.includes(c.status)) return;
+       if(selectedStatus.length > 0 && !selectedStatus.includes((c.status || "").trim())) return;
 
         if(monthFilter!=="All"){
             const d=new Date(c.due);
