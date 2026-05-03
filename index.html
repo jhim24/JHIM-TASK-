@@ -636,6 +636,7 @@ render();
 loadCheques();
 populateMonthFilter();
 async function loadCheques(){
+    
     const querySnapshot = await getDocs(collection(db, "cheques"));
     cheques = [];
 
@@ -645,6 +646,17 @@ async function loadCheques(){
 
     renderCheque();
 }
+    // FIX BUTTONS (MAKE GLOBAL)
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.showCheque = showCheque;
+window.showTasks = showTasks;
+window.addCheque = addCheque;
+window.editCheque = editCheque;
+window.deleteCheque = deleteCheque;
+window.addTask = addTask;
+window.editTask = editTask;
+window.del = del;
 </script>
     
 </body>
