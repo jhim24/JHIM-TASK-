@@ -296,6 +296,7 @@ Returned to Client: <span id="returnedClientCount">0</span>
 
 <div style="margin-top:10px;">
 <button class="primary-btn" onclick="addCheque()">Save Cheque</button>
+<button onclick="migrateLocalToFirebase()">⚡ Migrate Old Data</button>
 <button class="secondary-btn" onclick="showTasks()">Back</button>
 </div>
 
@@ -646,6 +647,25 @@ async function loadCheques(){
 
     renderCheque();
 }
+    async function migrateLocalToFirebase(){
+
+    const localData = JSON.parse(localStorage.getItem("cheques")) || [];
+
+    if(localData.length === 0){
+        alert("No local data found");
+        return;
+    }
+
+    if(!confirm("Migrate " + localData.length + " records to Firebase?")) return;
+
+    for(const c of localData){
+        await addDoc(collection(db, "cheques"), c);
+    }
+
+    alert("Migration completed!");
+
+    loadCheques();
+}
     // FIX BUTTONS (MAKE GLOBAL)
 window.openModal = openModal;
 window.closeModal = closeModal;
@@ -653,6 +673,7 @@ window.showCheque = showCheque;
 window.showTasks = showTasks;
 window.addCheque = addCheque;
 window.editCheque = editCheque;
+window.migrateLocalToFirebase = migrateLocalToFirebase;
 window.deleteCheque = deleteCheque;
 window.addTask = addTask;
 window.editTask = editTask;
