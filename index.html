@@ -194,14 +194,6 @@ tr:nth-child(even){ background:#f1f5fa; }
     max-height: 90vh;
     overflow-y: auto;
 }
-/* FORCE HORIZONTAL SCROLL */
-#chequeTable{
-    min-width: 1500px;
-}
-  
-#chequeTable{
-    min-width: 1300px; /* adjust if needed */
-}
 
 #chequeTable th,
 #chequeTable td{
@@ -215,11 +207,6 @@ tr:nth-child(even){ background:#f1f5fa; }
     border:1px solid #ccc;
 }
 
-/* force wide table */
-#chequeTable{
-    min-width:1400px;
-}
-
 /* optional: always show scrollbar */
 .table-scroll::-webkit-scrollbar{
     height:10px;
@@ -227,6 +214,21 @@ tr:nth-child(even){ background:#f1f5fa; }
 .table-scroll::-webkit-scrollbar-thumb{
     background:#999;
     border-radius:5px;
+}
+    /* ===== FINAL WORKING SCROLL ===== */
+.table-scroll{
+    width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+}
+
+#chequeTable{
+    min-width:1600px; /* force wider than screen */
+}
+
+#chequeTable th,
+#chequeTable td{
+    white-space: nowrap;
 }
 </style>
 </head>
