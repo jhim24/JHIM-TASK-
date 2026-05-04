@@ -359,9 +359,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-    // ================== AUTO FIX PATCH ==================
+   // ================== AUTO FIX PATCH ==================
 
-// FIX missing DOM variables
 const client = document.getElementById("client");
 const chequeNo = document.getElementById("chequeNo");
 const amount = document.getElementById("amount");
@@ -373,41 +372,15 @@ const narration = document.getElementById("narration");
 const searchClient = document.getElementById("searchClient");
 const filterMonth = document.getElementById("filterMonth");
 
+function showCheque(){
+    document.getElementById("taskSection").style.display = "none";
+    document.getElementById("chequeSection").style.display = "block";
 }
 
 function showTasks(){
     document.getElementById("taskSection").style.display = "block";
     document.getElementById("chequeSection").style.display = "none";
 }
-
-// FIX render() error (auto redirect)
-if(typeof render === "undefined"){
-    window.render = function(){
-        if(typeof renderCheque === "function"){
-            renderCheque();
-        }
-    }
-}
-
-// FIX loadCheques override (safe fix)
-const originalLoadCheques = loadCheques;
-loadCheques = async function(){
-
-    cheques = [];
-
-    const querySnapshot = await getDocs(collection(db, "cheques"));
-
-    querySnapshot.forEach((docSnap)=>{
-        cheques.push({ id: docSnap.id, ...docSnap.data() });
-    });
-
-    renderCheque();
-    if(typeof populateMonthFilter === "function"){
-        populateMonthFilter();
-    }
-
-    localStorage.setItem("cheques", JSON.stringify(cheques));
-};
 
 // ================== END PATCH ==================
  
@@ -530,7 +503,9 @@ function renderCheque(){
         <td>${c.amount}</td>
         <td>${c.due || "-"}</td>
         <td>${c.transDate || "-"}</td>
-        <span class="status-badge ${c.status.toLowerCase().replace(/ /g,'-')}">${c.status}</span>
+       <td>
+<span class="status-badge ${c.status.toLowerCase().replace(/ /g,'-')}">${c.status}</span>
+</td>
         <td>${reminder}</td>
         <td>
         <button onclick="editCheque(${i})">Edit</button>
@@ -594,7 +569,7 @@ searchClient.addEventListener("keyup", renderCheque);
 filterMonth.addEventListener("change", renderCheque);
 
 /* INIT */
-renderCheque();
+loadCheques();
 
 /* GLOBAL */
 
