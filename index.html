@@ -359,6 +359,61 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+    // ================== AUTO FIX PATCH ==================
+
+// FIX missing DOM variables
+const client = document.getElementById("client");
+const chequeNo = document.getElementById("chequeNo");
+const amount = document.getElementById("amount");
+const chequeDue = document.getElementById("chequeDue");
+const transDate = document.getElementById("transDate");
+const chequeStatus = document.getElementById("chequeStatus");
+const narration = document.getElementById("narration");
+
+const searchClient = document.getElementById("searchClient");
+const filterMonth = document.getElementById("filterMonth");
+
+// FIX navigation buttons
+function showCheque(){
+    document.getElementById("taskSection").style.display = "none";
+    document.getElementById("chequeSection").style.display = "block";
+}
+
+function showTasks(){
+    document.getElementById("taskSection").style.display = "block";
+    document.getElementById("chequeSection").style.display = "none";
+}
+
+// FIX render() error (auto redirect)
+if(typeof render === "undefined"){
+    window.render = function(){
+        if(typeof renderCheque === "function"){
+            renderCheque();
+        }
+    }
+}
+
+// FIX loadCheques override (safe fix)
+const originalLoadCheques = loadCheques;
+loadCheques = async function(){
+
+    cheques = [];
+
+    const querySnapshot = await getDocs(collection(db, "cheques"));
+
+    querySnapshot.forEach((docSnap)=>{
+        cheques.push({ id: docSnap.id, ...docSnap.data() });
+    });
+
+    renderCheque();
+    if(typeof populateMonthFilter === "function"){
+        populateMonthFilter();
+    }
+
+    localStorage.setItem("cheques", JSON.stringify(cheques));
+};
+
+// ================== END PATCH ==================
     // ===== FIX DOM REFERENCES =====
 const client = document.getElementById("client");
 const chequeNo = document.getElementById("chequeNo");
