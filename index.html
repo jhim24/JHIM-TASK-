@@ -193,6 +193,20 @@ tr:nth-child(even){ background:#f1f5fa; }
 #chequeTable{
     min-width: 1200px;
 }
+    /* ===== FINAL HORIZONTAL SCROLL FIX ===== */
+#chequeSection > div{
+    overflow-x: auto;
+    width: 100%;
+}
+
+#chequeTable{
+    min-width: 1300px; /* adjust if needed */
+}
+
+#chequeTable th,
+#chequeTable td{
+    white-space: nowrap;
+}
 </style>
 </head>
 
