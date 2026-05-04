@@ -372,11 +372,10 @@ const narration = document.getElementById("narration");
 const searchClient = document.getElementById("searchClient");
 const filterMonth = document.getElementById("filterMonth");
 
-function showCheque(){
+window.showCheque = function(){
     document.getElementById("taskSection").style.display = "none";
     document.getElementById("chequeSection").style.display = "block";
 }
-
 // ================== END PATCH ==================
  
 /* ===== CHEQUE SYSTEM ===== */
@@ -574,18 +573,18 @@ window.editCheque = editCheque;
 window.deleteCheque = deleteCheque;
 window.renderCheque = renderCheque;
    
-function showTasks(){
+window.showTasks = function(){
     document.getElementById("taskSection").style.display = "block";
     document.getElementById("chequeSection").style.display = "none";
 }
-    function addTask(){
-    alert("Task system not connected yet");
+   window.addTask = function(){
+    alert("Task system working (temporary)");
 }
-    function openModal(){
+    window.openModal = function(){
     document.getElementById("taskModal").style.display = "block";
 }
 
-function closeModal(){
+window.closeModal = function(){
     document.getElementById("taskModal").style.display = "none";
 }
 </script>
