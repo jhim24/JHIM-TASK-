@@ -207,6 +207,27 @@ tr:nth-child(even){ background:#f1f5fa; }
 #chequeTable td{
     white-space: nowrap;
 }
+    /* ===== EXCEL STYLE SCROLLBAR ===== */
+.table-scroll{
+    width:100%;
+    overflow-x:scroll;
+    overflow-y:hidden;
+    border:1px solid #ccc;
+}
+
+/* force wide table */
+#chequeTable{
+    min-width:1400px;
+}
+
+/* optional: always show scrollbar */
+.table-scroll::-webkit-scrollbar{
+    height:10px;
+}
+.table-scroll::-webkit-scrollbar-thumb{
+    background:#999;
+    border-radius:5px;
+}
 </style>
 </head>
 
@@ -328,7 +349,7 @@ Returned to Client: <span id="returnedClientCount">0</span>
 <hr style="margin:20px 0;">
 
 <!-- TABLE -->
-<div style="overflow-x:auto;">
+<div class="table-scroll">
     <table id="chequeTable"></table>
 </div>
     </div>
