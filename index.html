@@ -230,6 +230,13 @@ tr:nth-child(even){ background:#f1f5fa; }
 #chequeTable td{
     white-space: nowrap;
 }
+    /* ===== STATUS COLORS ===== */
+.pending{background:#f39c12;}
+.deposited{background:#3498db;}
+.paid-(cash){background:#2ecc71;}
+.cleared{background:#27ae60;}
+.bounced-cheque{background:#e74c3c;}
+.returned-to-client{background:#8e44ad;}
 </style>
 </head>
 
@@ -525,9 +532,9 @@ if(c.due){
     diff = Math.ceil((new Date(c.due) - today)/(1000*60*60*24));
 }
 
-// ===== STATUS LOGIC FIX =====
+/* ===== REMINDER LOGIC ===== */
 if(c.status === "Pending"){
-    if(diff > 1) reminder = "Due in "+diff+" days";
+    if(diff > 1) reminder = "Due in " + diff + " days";
     else if(diff === 1) reminder = "Due tomorrow";
     else if(diff === 0) reminder = "Due today";
     else reminder = "Overdue";
@@ -537,8 +544,8 @@ else if(c.status === "Deposited"){
     reminder = "For clearing";
 }
 
-else if(c.status === "Paid (Cash)"){
-    reminder = "Paid";
+else if(c.status === "Paid (Cash)" || c.status === "Cleared"){
+    reminder = "Completed";
 }
 
 else if(c.status === "Bounced Cheque"){
@@ -547,10 +554,6 @@ else if(c.status === "Bounced Cheque"){
 
 else if(c.status === "Returned to Client"){
     reminder = "Returned";
-}
-
-else if(c.status === "Cleared"){
-    reminder = "Cleared";
 }
         table.innerHTML += `
         <tr class="${diff<0 && c.status==='Pending' ? 'overdue-row':''}">
