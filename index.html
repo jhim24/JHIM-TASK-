@@ -190,11 +190,6 @@ tr:nth-child(even){ background:#f1f5fa; }
     overflow-y: auto;
 }
 
-#chequeTable{
-    display: block;
-    max-height: 400px;
-    overflow-y: auto;
-}
 </style>
 </head>
 
@@ -316,9 +311,10 @@ Returned to Client: <span id="returnedClientCount">0</span>
 <hr style="margin:20px 0;">
 
 <!-- TABLE -->
-<table id="chequeTable"></table>
-    
+<div style="overflow-x:auto;">
+    <table id="chequeTable"></table>
 </div>
+    
 <!-- ================= MODAL (UNCHANGED) ================= -->
 <div id="taskModal" class="modal">
 <div class="modal-content">
