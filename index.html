@@ -344,7 +344,7 @@ Returned to Client: <span id="returnedClientCount">0</span>
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } 
 from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -360,341 +360,195 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ===== TASK SYSTEM ===== */
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-let editIndex = -1;
-
-function save(){ localStorage.setItem("tasks", JSON.stringify(tasks)); }
-function openModal(){ taskModal.style.display="block"; }
-function closeModal(){ taskModal.style.display="none"; }
-
-function render(){
-    const table = document.getElementById("table");
-
-    table.innerHTML=`
-    <tr>
-    <th>Task</th>
-    <th>Category</th>
-    <th>Priority</th>
-    <th>Status</th>
-    <th>Due</th>
-    <th>Action</th>
-    </tr>`;
-
-    tasks.forEach((t,i)=>{
-        table.innerHTML+=`
-        <tr>
-        <td>${t.task}</td>
-        <td>${t.cat}</td>
-        <td>${t.priority}</td>
-        <td>${t.status}</td>
-        <td>${t.due || '-'}</td>
-        <td>
-            <button class="action-btn edit" onclick="editTask(${i})">Edit</button>
-            <button class="action-btn delete" onclick="del(${i})">Delete</button>
-        </td>
-        </tr>`;
-    });
-}
-
-function addTask(){
-    const taskVal = document.getElementById("task").value;
-    const categoryVal = document.getElementById("category").value;
-    const priorityVal = document.getElementById("priority").value;
-    const statusVal = document.getElementById("status").value;
-    const dueVal = document.getElementById("due").value;
-
-    if(!taskVal) return alert("Enter task");
-
-    const newTask = {
-        task: taskVal,
-        cat: categoryVal,
-        priority: priorityVal,
-        status: statusVal,
-        due: dueVal
-    };
-
-    if(editIndex === -1) tasks.push(newTask);
-    else { tasks[editIndex]=newTask; editIndex=-1; }
-
-    save();
-    render();
-    closeModal();
-}
-function editTask(i){
-    const t = tasks[i];
-    task.value=t.task;
-    category.value=t.cat;
-    priority.value=t.priority;
-    status.value=t.status;
-    due.value=t.due;
-    editIndex=i;
-    openModal();
-}
-
-function del(i){ tasks.splice(i,1); save(); render(); }
-
-/* ===== TOGGLE ===== */
-function showCheque(){
-    taskSection.style.display="none";
-    chequeSection.style.display="block";
-   loadCheques();
-}
-
-function showTasks(){
-    taskSection.style.display="block";
-    chequeSection.style.display="none";
-}
-
 /* ===== CHEQUE SYSTEM ===== */
-let cheques = JSON.parse(localStorage.getItem("cheques")) || [];
+let cheques = [];
 let chequeEditIndex = -1;
 
-function saveCheque(){
+/* ADD CHEQUE */
+async function addCheque(){
+    const data = {
+        client: client.value,
+        chequeNo: chequeNo.value,
+        amount: amount.value,
+        due: chequeDue.value,
+        transDate: transDate.value,
+        status: chequeStatus.value,
+        narration: narration.value || ""
+    };
+
+    if(!data.client) return alert("Enter client");
+
+    try {
+        if(chequeEditIndex !== -1){
+            await deleteDoc(doc(db, "cheques", cheques[chequeEditIndex].id));
+            await addDoc(collection(db, "cheques"), data);
+            chequeEditIndex = -1;
+        } else {
+            await addDoc(collection(db, "cheques"), data);
+        }
+
+        client.value="";
+        chequeNo.value="";
+        amount.value="";
+        chequeDue.value="";
+        transDate.value="";
+        narration.value="";
+
+        await loadCheques();
+
+    } catch(e){
+        alert("Error: " + e.message);
+        console.error(e);
+    }
+}
+
+/* LOAD FROM FIREBASE */
+async function loadCheques(){
+    const snapshot = await getDocs(collection(db, "cheques"));
+    cheques = [];
+
+    snapshot.forEach(docSnap=>{
+        cheques.push({ id: docSnap.id, ...docSnap.data() });
+    });
+
+    renderCheque();
+    populateMonthFilter();
+
+    // BACKUP
     localStorage.setItem("cheques", JSON.stringify(cheques));
 }
 
-async function addCheque(){
-
-    const data = {
-    client: client.value,
-    chequeNo: chequeNo.value,
-    amount: amount.value,
-    due: chequeDue.value,
-    transDate: transDate.value,
-    status: chequeStatus.value,
-    narration: narration.value || ""
-};
-    if(!data.client) return alert("Enter client");
-
-   if(chequeEditIndex !== -1){
-    await deleteDoc(doc(db, "cheques", cheques[chequeEditIndex].id));
-    await addDoc(collection(db, "cheques"), data);
-    chequeEditIndex = -1;
-} else {
-    await addDoc(collection(db, "cheques"), data);
-}
-
-    client.value="";
-    chequeNo.value="";
-    amount.value="";
-    chequeDue.value="";
-    transDate.value="";
-    narration.value="";
-
-    await loadCheques();
-
-// 👉 BACKUP SAVE
-localStorage.setItem("cheques", JSON.stringify(cheques));
-
-populateMonthFilter();
-}
-
+/* RENDER TABLE */
 function renderCheque(){
 
     const table = document.getElementById("chequeTable");
+
     const selectedStatus = [...document.querySelectorAll('#statusFilter input:checked')]
-.map(cb => cb.value.toLowerCase().trim());
-    const search = searchClient.value.toLowerCase();
+    .map(cb => cb.value.toLowerCase().trim());
+
+    const search = (searchClient.value || "").toLowerCase();
     const monthFilter = filterMonth.value;
 
-    table.innerHTML=`<tr>
-    <th>#</th>
-    <th>Client</th>
-    <th>Cheque</th>
-    <th>Amount</th>
-    <th>Due (PDC)</th>
-    <th>Transaction</th>
-    <th>Status</th>
-    <th>Reminder</th>
-    <th>Action</th>
-<th>Narration</th>
+    table.innerHTML = `
+    <tr>
+    <th>#</th><th>Client</th><th>Cheque</th><th>Amount</th>
+    <th>Due</th><th>Transaction</th><th>Status</th>
+    <th>Reminder</th><th>Action</th><th>Narration</th>
     </tr>`;
 
     const today = new Date();
 
-    [...cheques]
-    .sort((a,b)=> new Date(a.due||0) - new Date(b.due||0))
-    .forEach((c,index)=>{
+    cheques.forEach((c,i)=>{
 
-        const realIndex = cheques.indexOf(c);
+        // FILTER STATUS
+        if(selectedStatus.length && !selectedStatus.includes((c.status||"").toLowerCase())) return;
 
-       if(selectedStatus.length > 0 && !selectedStatus.includes((c.status || "").toLowerCase().trim())) return;
-
-        if(monthFilter!=="All"){
-            const d=new Date(c.due);
-            const key=d.getFullYear()+"-"+(d.getMonth()+1);
-            if(key!==monthFilter) return;
+        // FILTER MONTH
+        if(monthFilter !== "All" && c.due){
+            const d = new Date(c.due);
+            const key = d.getFullYear()+"-"+(d.getMonth()+1);
+            if(key !== monthFilter) return;
         }
 
-       if(search && !(c.client || "").toLowerCase().includes(search)) return;
+        // SEARCH
+        if(search && !(c.client || "").toLowerCase().includes(search)) return;
 
-        let diff=0;
+        let reminder = "";
+        let diff = 0;
+
         if(c.due){
-            diff=Math.ceil((new Date(c.due)-today)/(1000*60*60*24));
+            diff = Math.ceil((new Date(c.due) - today)/(1000*60*60*24));
         }
 
-        let reminder="";
-       
-if(c.status==="Pending"){
-    if(diff>1) reminder="Due in "+diff+" days";
-    else if(diff===1) reminder="Due tomorrow";
-    else if(diff===0) reminder="Due today";
-    else reminder="Overdue";
-}
+        if(c.status === "Pending"){
+            if(diff > 1) reminder = "Due in "+diff+" days";
+            else if(diff === 1) reminder = "Due tomorrow";
+            else if(diff === 0) reminder = "Due today";
+            else reminder = "Overdue";
+        }
 
-// ✅ SIMPLIFIED DEPOSITED
-if(c.status==="Deposited"){
-    reminder = "For clearing";
-}
-        table.innerHTML+=`
+        if(c.status === "Deposited"){
+            reminder = "For clearing";
+        }
+
+        table.innerHTML += `
         <tr class="${diff<0 && c.status==='Pending' ? 'overdue-row':''}">
-        <td>${index+1}</td>
+        <td>${i+1}</td>
         <td>${c.client}</td>
         <td>${c.chequeNo}</td>
         <td>${c.amount}</td>
-        <td>${c.due||"-"}</td>
-        <td>${c.transDate||"-"}</td>
-        <td>
-        <span class="status-badge ${
-            c.status==="Pending"?"pending":
-            c.status==="Deposited"?"deposited":
-            c.status==="Paid (Cash)"||c.status==="Cleared"?"paid":
-            "returned"
-        }">${c.status}</span>
-        </td>
+        <td>${c.due || "-"}</td>
+        <td>${c.transDate || "-"}</td>
+        <td><span class="status-badge">${c.status}</span></td>
         <td>${reminder}</td>
-       <td>
-<button class="action-btn edit" onclick="editCheque(${realIndex})">Edit</button>
-<button class="action-btn delete" onclick="deleteCheque(${realIndex})">Delete</button>
-</td>
-
-<td style="text-align:left;">${c.narration || "-"}</td>
-
-</tr>`;
-
+        <td>
+        <button onclick="editCheque(${i})">Edit</button>
+        <button onclick="deleteCheque(${i})">Delete</button>
+        </td>
+        <td>${c.narration || "-"}</td>
+        </tr>`;
     });
-
-    // TOTAL (PDC only)
-    let pending = cheques.filter(c=>c.due && c.status==="Pending")
-    .reduce((s,c)=>s+Number(c.amount||0),0);
-
-    let returned = cheques.filter(c=>c.due && c.status==="Bounced Cheque")
-    .reduce((s,c)=>s+Number(c.amount||0),0);
-
-    let collected = cheques.filter(c=>c.due && c.status==="Cleared")
-    .reduce((s,c)=>s+Number(c.amount||0),0);
-
-    totalCollected.innerText=collected;
-    totalPending.innerText=pending;
-    totalReturned.innerText=returned;
 }
 
-function editCheque(i){
-    const c=cheques[i];
-    client.value=c.client;
-    chequeNo.value=c.chequeNo;
-    amount.value=c.amount;
-    chequeDue.value=c.due;
-    transDate.value=c.transDate||"";
-    chequeStatus.value=c.status;
-    chequeEditIndex=i;
-    narration.value = c.narration || "";
-}
-
+/* DELETE */
 async function deleteCheque(i){
     if(confirm("Delete?")){
-       await deleteDoc(doc(db, "cheques", cheques[i].id));
-await loadCheques();
-
-// 👉 UPDATE BACKUP
-localStorage.setItem("cheques", JSON.stringify(cheques));
+        await deleteDoc(doc(db, "cheques", cheques[i].id));
+        await loadCheques();
     }
 }
 
+/* EDIT */
+function editCheque(i){
+    const c = cheques[i];
+    client.value = c.client;
+    chequeNo.value = c.chequeNo;
+    amount.value = c.amount;
+    chequeDue.value = c.due;
+    transDate.value = c.transDate || "";
+    chequeStatus.value = c.status;
+    narration.value = c.narration || "";
+    chequeEditIndex = i;
+}
+
+/* MONTH FILTER */
 function populateMonthFilter(){
+    filterMonth.innerHTML = '<option value="All">All Dates</option>';
 
-    filterMonth.innerHTML='<option value="All">All Dates</option>';
-
-    const unique=[...new Set(
+    const unique = [...new Set(
         cheques.map(c=>{
             if(!c.due) return null;
-            const d=new Date(c.due);
+            const d = new Date(c.due);
             return d.getFullYear()+"-"+(d.getMonth()+1);
         })
     )].filter(Boolean);
 
-    unique.sort((a,b)=> new Date(b)-new Date(a));
-
     unique.forEach(val=>{
-        const [year,month]=val.split("-");
-        const date=new Date(year,month-1);
+        const [y,m] = val.split("-");
+        const d = new Date(y, m-1);
 
-        const opt=document.createElement("option");
-        opt.value=val;
-        opt.text=date.toLocaleString('default',{month:'long'})+" "+year;
+        const opt = document.createElement("option");
+        opt.value = val;
+        opt.text = d.toLocaleString('default',{month:'long'})+" "+y;
 
         filterMonth.appendChild(opt);
     });
 }
 
+/* AUTO FILTER */
+document.querySelectorAll('#statusFilter input').forEach(cb=>{
+    cb.addEventListener("change", renderCheque);
+});
+searchClient.addEventListener("keyup", renderCheque);
+filterMonth.addEventListener("change", renderCheque);
+
 /* INIT */
-render();
-await loadCheques();
-populateMonthFilter();
-renderCheque();
-    
-    const querySnapshot = await getDocs(collection(db, "cheques"));
-    cheques = [];
+loadCheques();
 
-    querySnapshot.forEach((docSnap)=>{
-        cheques.push({ id: docSnap.id, ...docSnap.data() });
-    });
-
-    renderCheque();
-}
-    // 👉 SAVE BACKUP AFTER LOAD
-localStorage.setItem("cheques", JSON.stringify(cheques));
-    async function migrateLocalToFirebase(){
-
-    const localData = JSON.parse(localStorage.getItem("cheques")) || [];
-
-    if(localData.length === 0){
-        alert("No local data found");
-        return;
-    }
-
-    if(!confirm("Migrate " + localData.length + " records to Firebase?")) return;
-
-    for(const c of localData){
-        await addDoc(collection(db, "cheques"), c);
-    }
-
-    alert("Migration completed!");
-
-    loadCheques();
-}
-    // FIX BUTTONS (MAKE GLOBAL)
-window.openModal = openModal;
-window.closeModal = closeModal;
-window.showCheque = showCheque;
-window.showTasks = showTasks;
+/* GLOBAL */
 window.addCheque = addCheque;
 window.editCheque = editCheque;
-window.migrateLocalToFirebase = migrateLocalToFirebase;
 window.deleteCheque = deleteCheque;
-window.addTask = addTask;
-window.editTask = editTask;
-window.del = del;
-    // AUTO FILTER FIX
-document.querySelectorAll('#statusFilter input').forEach(cb=>{
-    cb.addEventListener("change", () => {
-        renderCheque();
-    });
-});
-
-document.getElementById("searchClient").addEventListener("keyup", renderCheque);
-document.getElementById("filterMonth").addEventListener("change", renderCheque);
 </script>
     
 </body>
