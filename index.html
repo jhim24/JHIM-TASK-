@@ -578,14 +578,20 @@ window.addCheque = addCheque;
 window.editCheque = editCheque;
 window.deleteCheque = deleteCheque;
 window.renderCheque = renderCheque;
-    function showCheque(){
-    document.getElementById("taskSection").style.display = "none";
-    document.getElementById("chequeSection").style.display = "block";
-}
-
+   
 function showTasks(){
     document.getElementById("taskSection").style.display = "block";
     document.getElementById("chequeSection").style.display = "none";
+}
+    function addTask(){
+    alert("Task system not connected yet");
+}
+    function openModal(){
+    document.getElementById("taskModal").style.display = "block";
+}
+
+function closeModal(){
+    document.getElementById("taskModal").style.display = "none";
 }
 </script>
     
