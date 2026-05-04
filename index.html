@@ -21,7 +21,12 @@ body {
 .header h1{margin:0;font-size:20px;}
 .header p{margin:2px 0 0;font-size:12px;}
 
-.container { padding:20px; max-width:1100px; margin:auto; }
+.container {
+    padding:20px;
+    max-width:1100px;
+    margin:auto;
+    overflow-x:auto; /* ✅ ADD THIS */
+}
 
 .cards { display:flex; gap:15px; flex-wrap:wrap; }
 .card {
@@ -191,14 +196,9 @@ tr:nth-child(even){ background:#f1f5fa; }
 }
 /* FORCE HORIZONTAL SCROLL */
 #chequeTable{
-    min-width: 1200px;
+    min-width: 1500px;
 }
-    /* ===== FINAL HORIZONTAL SCROLL FIX ===== */
-#chequeSection > div{
-    overflow-x: auto;
-    width: 100%;
-}
-
+  
 #chequeTable{
     min-width: 1300px; /* adjust if needed */
 }
