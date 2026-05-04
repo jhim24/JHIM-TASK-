@@ -404,10 +404,8 @@ async function addCheque(){
 
 /* LOAD FROM FIREBASE */
 async function loadCheques(){
-    const snapshot = await getDocs(collection(db, "cheques"));
-    cheques = [];
-
-    snapshot.forEach(docSnap=>{
+    
+    querySnapshot.forEach((docSnap)=>{
         cheques.push({ id: docSnap.id, ...docSnap.data() });
     });
 
@@ -417,7 +415,6 @@ async function loadCheques(){
     // BACKUP
     localStorage.setItem("cheques", JSON.stringify(cheques));
 }
-
 /* RENDER TABLE */
 function renderCheque(){
 
@@ -543,12 +540,18 @@ searchClient.addEventListener("keyup", renderCheque);
 filterMonth.addEventListener("change", renderCheque);
 
 /* INIT */
+render();
 loadCheques();
 
 /* GLOBAL */
 window.addCheque = addCheque;
 window.editCheque = editCheque;
 window.deleteCheque = deleteCheque;
+    // FIX BUTTONS (IMPORTANT)
+window.addCheque = addCheque;
+window.editCheque = editCheque;
+window.deleteCheque = deleteCheque;
+window.renderCheque = renderCheque;
 </script>
     
 </body>
