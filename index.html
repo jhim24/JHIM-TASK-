@@ -373,10 +373,6 @@ const narration = document.getElementById("narration");
 const searchClient = document.getElementById("searchClient");
 const filterMonth = document.getElementById("filterMonth");
 
-// FIX navigation buttons
-function showCheque(){
-    document.getElementById("taskSection").style.display = "none";
-    document.getElementById("chequeSection").style.display = "block";
 }
 
 function showTasks(){
@@ -414,18 +410,7 @@ loadCheques = async function(){
 };
 
 // ================== END PATCH ==================
-    // ===== FIX DOM REFERENCES =====
-const client = document.getElementById("client");
-const chequeNo = document.getElementById("chequeNo");
-const amount = document.getElementById("amount");
-const chequeDue = document.getElementById("chequeDue");
-const transDate = document.getElementById("transDate");
-const chequeStatus = document.getElementById("chequeStatus");
-const narration = document.getElementById("narration");
-
-const searchClient = document.getElementById("searchClient");
-const filterMonth = document.getElementById("filterMonth");
-
+ 
 /* ===== CHEQUE SYSTEM ===== */
 let cheques = [];
 let chequeEditIndex = -1;
@@ -545,7 +530,7 @@ function renderCheque(){
         <td>${c.amount}</td>
         <td>${c.due || "-"}</td>
         <td>${c.transDate || "-"}</td>
-        <<span class="status-badge ${c.status.toLowerCase().replace(/ /g,'-')}">${c.status}</span>
+        <span class="status-badge ${c.status.toLowerCase().replace(/ /g,'-')}">${c.status}</span>
         <td>${reminder}</td>
         <td>
         <button onclick="editCheque(${i})">Edit</button>
