@@ -518,24 +518,40 @@ function renderCheque(){
         // SEARCH
         if(search && !(c.client || "").toLowerCase().includes(search)) return;
 
-        let reminder = "";
-        let diff = 0;
+       let reminder = "";
+let diff = 0;
 
-        if(c.due){
-            diff = Math.ceil((new Date(c.due) - today)/(1000*60*60*24));
-        }
+if(c.due){
+    diff = Math.ceil((new Date(c.due) - today)/(1000*60*60*24));
+}
 
-        if(c.status === "Pending"){
-            if(diff > 1) reminder = "Due in "+diff+" days";
-            else if(diff === 1) reminder = "Due tomorrow";
-            else if(diff === 0) reminder = "Due today";
-            else reminder = "Overdue";
-        }
+// ===== STATUS LOGIC FIX =====
+if(c.status === "Pending"){
+    if(diff > 1) reminder = "Due in "+diff+" days";
+    else if(diff === 1) reminder = "Due tomorrow";
+    else if(diff === 0) reminder = "Due today";
+    else reminder = "Overdue";
+}
 
-        if(c.status === "Deposited"){
-            reminder = "For clearing";
-        }
+else if(c.status === "Deposited"){
+    reminder = "For clearing";
+}
 
+else if(c.status === "Paid (Cash)"){
+    reminder = "Paid";
+}
+
+else if(c.status === "Bounced Cheque"){
+    reminder = "Bounced";
+}
+
+else if(c.status === "Returned to Client"){
+    reminder = "Returned";
+}
+
+else if(c.status === "Cleared"){
+    reminder = "Cleared";
+}
         table.innerHTML += `
         <tr class="${diff<0 && c.status==='Pending' ? 'overdue-row':''}">
         <td>${i+1}</td>
