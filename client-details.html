@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Client Details</title>
+
+<style>
+body{
+    font-family:Segoe UI;
+    margin:0;
+    background:#f5f7fa;
+}
+
+.header{
+    background:#2c5fa8;
+    color:white;
+    text-align:center;
+    padding:15px;
+}
+
+.container{
+    padding:20px;
+    max-width:1100px;
+    margin:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+    background:white;
+}
+
+th,td{
+    padding:10px;
+    border:1px solid #ddd;
+    text-align:center;
+}
+
+th{
+    background:#2c5fa8;
+    color:white;
+}
+
+tr:nth-child(even){
+    background:#f5f7fa;
+}
+
+button{
+    padding:8px 12px;
+    background:#2c5fa8;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h2 id="title">Client Details</h2>
+</div>
+
+<div class="container">
+
+<button onclick="window.location.href='client.html'">⬅ Back</button>
+
+<table id="detailsTable"></table>
+
+</div>
+
+<script>
+
+let cheques = JSON.parse(localStorage.getItem("cheques")) || [];
+let selectedClient = localStorage.getItem("selectedClient");
+
+document.getElementById("title").textContent = selectedClient;
+
+function loadDetails(){
+
+    const table = document.getElementById("detailsTable");
+
+    table.innerHTML = `
+    <tr>
+        <th>#</th>
+        <th>Cheque No</th>
+        <th>Amount</th>
+        <th>Due</th>
+        <th>Status</th>
+        <th>Narration</th>
+    </tr>`;
+
+    let i = 1;
+
+    cheques
+    .sort((a,b)=> new Date(a.due || 0) - new Date(b.due || 0))
+    .forEach(c=>{
+
+        if(c.client !== selectedClient) return;
+
+        table.innerHTML += `
+        <tr>
+            <td>${i++}</td>
+            <td>${c.chequeNo}</td>
+            <td>QAR ${Number(c.amount || 0).toLocaleString()}</td>
+            <td>${c.due || "-"}</td>
+            <td>${c.status}</td>
+            <td style="text-align:left">${c.narration || "-"}</td>
+        </tr>`;
+    });
+}
+
+loadDetails();
+
+</script>
+
+</body>
+</html>
