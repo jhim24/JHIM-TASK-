@@ -23,9 +23,8 @@ body {
 
 .container {
     padding:20px;
-    max-width:1100px;
+    max-width:100%;
     margin:auto;
-    overflow-x:auto; /* ✅ ADD THIS */
 }
 
 .cards { display:flex; gap:15px; flex-wrap:wrap; }
@@ -191,39 +190,25 @@ tr:nth-child(even){ background:#f1f5fa; }
 }
     /* ===== SCROLL FIX ===== */
 #chequeSection{
-    max-height: 90vh;
-    overflow-y: auto;
+    max-height: none;
+    overflow: visible;
 }
 
 #chequeTable th,
 #chequeTable td{
     white-space: nowrap;
 }
-    /* ===== EXCEL STYLE SCROLLBAR ===== */
-.table-scroll{
-    width:100%;
-    overflow-x:scroll;
-    overflow-y:hidden;
-    border:1px solid #ccc;
-}
-
-/* optional: always show scrollbar */
-.table-scroll::-webkit-scrollbar{
-    height:10px;
-}
-.table-scroll::-webkit-scrollbar-thumb{
-    background:#999;
-    border-radius:5px;
-}
-    /* ===== FINAL WORKING SCROLL ===== */
+ /* ===== FINAL SINGLE SCROLL ===== */
 .table-scroll{
     width:100%;
     overflow-x:auto;
     overflow-y:hidden;
+    margin-top:10px;
 }
 
 #chequeTable{
-    min-width:1600px; /* force wider than screen */
+    min-width:1600px;
+    width:max-content;
 }
 
 #chequeTable th,
