@@ -109,8 +109,9 @@ function renderClientSummary(){
         const due = new Date(c.due);
 
         // ✅ FILTER BY DATE RANGE
-        if(fromDate && new Date(c.due) < new Date(fromDate)) return;
-        if(toDate && new Date(c.due) > new Date(toDate)) return;
+        if(c.due){
+    summary[c.client].total++;
+}
 
         if(!summary[c.client]){
             summary[c.client] = {
@@ -124,9 +125,16 @@ function renderClientSummary(){
             };
         }
 
-       // TOTAL PDC ONLY
+       // TOTAL CHEQUE BASED ON DUE DATE RANGE
 if(c.due){
-    summary[c.client].total++;
+    const dueDate = new Date(c.due);
+
+    if(
+        (!fromDate || dueDate >= new Date(fromDate)) &&
+        (!toDate || dueDate <= new Date(toDate))
+    ){
+        summary[c.client].total++;
+    }
 }
        if(c.due){
     summary[c.client].amount += Number(c.amount || 0);
