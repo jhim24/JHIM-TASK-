@@ -65,8 +65,9 @@ table {
 }
 th, td {
     border:1px solid #d6dee6;
-    padding:14px 18px;
+    padding:8px 10px;   /* ⬅️ mas maliit */
     text-align:center;
+    font-size:13px;     /* ⬅️ optional */
 }
 th { background:#2c5fa8; color:white; }
 tr:nth-child(even){ background:#f1f5fa; }
@@ -139,8 +140,9 @@ tr:nth-child(even){ background:#f1f5fa; }
 }
 
 #chequeTable td:last-child button{
-    display:inline-block;
-    margin:2px;
+    padding:3px 6px;
+    font-size:11px;
+    margin:1px;
 }
     /* ===== CHEQUE STATUS COLORS ===== */
 .status-badge{
@@ -212,11 +214,11 @@ tr:nth-child(even){ background:#f1f5fa; }
  /* ===== FINAL SINGLE SCROLL ===== */
 .table-scroll{
     width:100%;
+    max-height:400px;   /* ⬅️ control height */
     overflow-x:auto;
-    overflow-y:hidden;
+    overflow-y:auto;    /* ⬅️ vertical scroll */
     margin-top:10px;
 }
-
 #chequeTable{
     min-width:1600px;
     width:max-content;
