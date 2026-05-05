@@ -271,25 +271,6 @@ tr:nth-child(even){ background:#f1f5fa; }
 Returned to Client: <span id="returnedClientCount">0</span>
 </div>
 
-<!-- FILTER BOX -->
-<div class="section-box">
-<div class="section-title">Filters</div>
-
-<div class="controls">
-<div id="statusFilter">
-
-<label><input type="checkbox" value="Pending" onchange="renderCheque()"> Pending</label>
-
-<label><input type="checkbox" value="Deposited" onchange="renderCheque()"> Deposited</label>
-
-<label><input type="checkbox" value="Paid (Cash)" onchange="renderCheque()"> Paid</label>
-
-<label><input type="checkbox" value="Bounced Cheque" onchange="renderCheque()"> Bounced</label>
-
-<label><input type="checkbox" value="Returned to Client" onchange="renderCheque()"> Returned</label>
-
-</div>
-
 <select id="filterMonth" onchange="renderCheque()">
 <option value="All">All Dates</option>
 </select>
@@ -333,7 +314,7 @@ Returned to Client: <span id="returnedClientCount">0</span>
 </div>
 
 <div style="margin-top:10px;">
-<button class="primary-btn" onclick="addCheque()">Save Cheque</button>
+<button class="primary-btn" onclick="openChequeModal()">+ Add Cheque</button>
 <button onclick="migrateLocalToFirebase()">⚡ Migrate Old Data</button>
 <button class="secondary-btn" onclick="showTasks()">Back</button>
 </div>
@@ -378,6 +359,37 @@ Returned to Client: <span id="returnedClientCount">0</span>
 <input type="date" id="due">
 
 <button onclick="addTask()">Save Task</button>
+</div>
+</div>
+</div>
+    <!-- ===== CHEQUE MODAL ===== -->
+<div id="chequeModal" class="modal">
+<div class="modal-content">
+<span class="close" onclick="closeChequeModal()">×</span>
+
+<h3>Add Cheque</h3>
+
+<div class="form-grid">
+
+<input id="client" placeholder="Client Name">
+<input id="chequeNo" placeholder="Cheque No">
+<input id="amount" type="number" placeholder="Amount">
+<input id="narration" placeholder="Narration">
+
+<select id="chequeStatus">
+<option>Pending</option>
+<option>Deposited</option>
+<option>Paid (Cash)</option>
+<option>Bounced Cheque</option>
+<option>Cleared</option>
+<option>Returned to Client</option>
+</select>
+
+<input id="chequeDue" type="date">
+<input id="transDate" type="date">
+
+<button onclick="addCheque()">Save Cheque</button>
+
 </div>
 </div>
 </div>
