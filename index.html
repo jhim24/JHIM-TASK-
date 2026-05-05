@@ -279,43 +279,10 @@ Returned to Client: <span id="returnedClientCount">0</span>
 </div>
 </div>
 
-<!-- FORM BOX -->
-<div class="section-box">
-<div class="section-title">Add Cheque</div>
-
-<div class="form-row">
-<input id="client" placeholder="Client Name">
-<input id="chequeNo" placeholder="Cheque No">
-<input id="amount" type="number" placeholder="Amount">
-<input id="narration" placeholder="Narration (e.g. Payment for invoice #123)">
-
-<select id="chequeStatus">
-<option>Pending</option>
-<option>Deposited</option>
-<option>Paid (Cash)</option>
-<option>Bounced Cheque</option>
-<option>Cleared</option>
-<option>Returned to Client</option>
-</select>
-</div>
-
-<div class="form-row">
-
-<div>
-<label>Due Date (PDC)</label>
-<input id="chequeDue" type="date">
-</div>
-
-<div>
-<label>Transaction Date</label>
-<input id="transDate" type="date">
-</div>
-
 </div>
 
 <div style="margin-top:10px;">
 <button class="primary-btn" onclick="openChequeModal()">+ Add Cheque</button>
-<button onclick="migrateLocalToFirebase()">⚡ Migrate Old Data</button>
 <button class="secondary-btn" onclick="showTasks()">Back</button>
 </div>
 
@@ -464,6 +431,7 @@ async function addCheque(){
         narration.value="";
 
         await loadCheques();
+document.getElementById("chequeModal").style.display = "none";
 
     } catch(e){
         alert("Error: " + e.message);
@@ -649,6 +617,13 @@ window.showTasks = function(){
 
 window.closeModal = function(){
     document.getElementById("taskModal").style.display = "none";
+}
+    window.openChequeModal = function(){
+    document.getElementById("chequeModal").style.display = "block";
+}
+
+window.closeChequeModal = function(){
+    document.getElementById("chequeModal").style.display = "none";
 }
 </script>
     
