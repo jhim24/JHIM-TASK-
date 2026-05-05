@@ -138,7 +138,9 @@ function renderClientSummary(){
         if(c.status === "Deposited") summary[c.client].deposited++;
         if(c.status === "Pending") summary[c.client].pending++;
         if(c.status === "Paid (Cash)") summary[c.client].cash++;
-        if((c.status || "").trim().toLowerCase() === "returned to client"){
+       const status = (c.status || "").toLowerCase();
+
+if(status.includes("returned to client")){
     summary[c.client].returned++;
 }
 
