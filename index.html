@@ -113,7 +113,18 @@ tr:nth-child(even){ background:#f1f5fa; }
 .close { float:right; font-size:20px; cursor:pointer; }
 
 .form-grid {
-    display:grid; grid-template-columns:1fr 1fr; gap:12px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.form-grid input,
+.form-grid select {
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    box-sizing:border-box; /* 🔥 IMPORTANT */
 }
 .form-grid input,.form-grid select {
     width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;
@@ -331,6 +342,7 @@ Returned to Client: <span id="returnedClientCount">0</span>
 
 <input id="client" placeholder="Client Name">
 <input id="chequeNo" placeholder="Cheque No">
+
 <input id="amount" type="number" placeholder="Amount">
 <input id="narration" placeholder="Narration">
 
@@ -344,11 +356,13 @@ Returned to Client: <span id="returnedClientCount">0</span>
 </select>
 
 <input id="chequeDue" type="date">
+
 <input id="transDate" type="date">
 
+<div style="grid-column:span 2;">
 <button onclick="addCheque()">Save Cheque</button>
-
 </div>
+
 </div>
 </div>
 
