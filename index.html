@@ -235,6 +235,24 @@ tr:nth-child(even){ background:#f1f5fa; }
 .cleared{background:#27ae60;}
 .bounced-cheque{background:#e74c3c;}
 .returned-to-client{background:#8e44ad;}
+    #statusFilter {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+#statusFilter label {
+    background:#f1f4f9;
+    padding:6px 10px;
+    border-radius:6px;
+    cursor:pointer;
+    border:1px solid #ccc;
+    font-size:12px;
+}
+
+#statusFilter input {
+    margin-right:5px;
+}
 </style>
 </head>
 
@@ -286,7 +304,16 @@ Returned to Client: <span id="returnedClientCount">0</span>
 </select>
 
 <input id="searchClient" placeholder="Search client...">
+<div id="statusFilter" style="margin-top:10px;">
 
+<label><input type="checkbox" value="Pending" checked> Pending</label>
+<label><input type="checkbox" value="Deposited" checked> Deposited</label>
+<label><input type="checkbox" value="Paid (Cash)" checked> Paid (Cash)</label>
+<label><input type="checkbox" value="Bounced Cheque" checked> Bounced</label>
+<label><input type="checkbox" value="Cleared" checked> Cleared</label>
+<label><input type="checkbox" value="Returned to Client" checked> Returned</label>
+
+</div>
 <div style="margin-top:10px;">
 <button class="primary-btn" onclick="openChequeModal()">+ Add Cheque</button>
 <button class="secondary-btn" onclick="showTasks()">Back</button>
