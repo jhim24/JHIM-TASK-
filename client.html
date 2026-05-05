@@ -113,7 +113,13 @@ function renderClientSummary(){
 
     cheques.forEach(c => {
 
-        if(!c.due) return;
+        // allow returned kahit walang due
+const statusRaw = (c.status || "").toLowerCase();
+
+const isReturned = statusRaw.includes("returned to client");
+
+// skip ONLY if walang due at hindi returned
+if(!c.due && !isReturned) return;
 
         const due = new Date(c.due);
 
