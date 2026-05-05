@@ -253,10 +253,11 @@ tr:nth-child(even){ background:#f1f5fa; }
 <table id="table"></table>
 
 </div>
+<!-- ================= CHEQUE SECTION ================= -->
+<div id="chequeSection" class="container" style="display:none;">
 
 <h2>Cheque System</h2>
 
-<!-- CARDS -->
 <div class="cards">
 <div class="card"><div class="card-header green">COLLECTED</div><div class="card-body" id="totalCollected">0</div></div>
 <div class="card"><div class="card-header orange">PENDING</div><div class="card-body" id="totalPending">0</div></div>
@@ -273,7 +274,6 @@ Returned to Client: <span id="returnedClientCount">0</span>
 
 <input id="searchClient" placeholder="Search client...">
 
-<!-- BUTTONS -->
 <div style="margin-top:10px;">
 <button class="primary-btn" onclick="openChequeModal()">+ Add Cheque</button>
 <button class="secondary-btn" onclick="showTasks()">Back</button>
@@ -281,28 +281,11 @@ Returned to Client: <span id="returnedClientCount">0</span>
 
 <hr style="margin:20px 0;">
 
-<!-- TABLE -->
 <div class="table-scroll">
     <table id="chequeTable"></table>
 </div>
 
-<!-- CARDS -->
-<div class="cards">
-<div class="card"><div class="card-header green">COLLECTED</div><div class="card-body" id="totalCollected">0</div></div>
-<div class="card"><div class="card-header orange">PENDING</div><div class="card-body" id="totalPending">0</div></div>
-<div class="card"><div class="card-header red">RETURNED</div><div class="card-body" id="totalReturned">0</div></div>
 </div>
-
-<div style="margin:10px 0; font-weight:bold;">
-Returned to Client: <span id="returnedClientCount">0</span>
-</div>
-
-<select id="filterMonth" onchange="renderCheque()">
-<option value="All">All Dates</option>
-</select>
-
-<input id="searchClient" placeholder="Search client..." onkeyup="renderCheque()">
-
 <!-- ================= MODAL (UNCHANGED) ================= -->
 <div id="taskModal" class="modal">
 <div class="modal-content">
