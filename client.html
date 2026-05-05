@@ -53,11 +53,6 @@ tr:hover{
     background:#eaf2ff;
 }
 
-tr:first-child{
-    background:#d4edda !important;
-    font-weight:bold;
-}
-
 button{
     padding:8px 12px;
     background:#2c5fa8;
@@ -168,7 +163,7 @@ function renderClientSummary(){
         grandTotal += s.amount;
 
         table.innerHTML += `
-        <tr style="${index === 0 ? 'background:#d4edda;font-weight:bold;' : ''}">
+        <tr>
             <td style="text-align:left; cursor:pointer; color:#2c5fa8;"
             onclick="viewClient('${client}')">
             ${client}
@@ -183,7 +178,6 @@ function renderClientSummary(){
         </tr>`;
     });
 
-    // FOOTER TOTAL
     table.innerHTML += `
     <tr style="font-weight:bold; background:#f1f4f9;">
         <td>TOTAL</td>
@@ -197,13 +191,11 @@ function renderClientSummary(){
     </tr>`;
 }
 
-// CLICK CLIENT
 function viewClient(name){
     localStorage.setItem("selectedClient", name);
-    alert("Client selected: " + name);
+    window.location.href = "client-details.html";
 }
 
-// AUTO LOAD
 renderClientSummary();
 
 </script>
