@@ -518,7 +518,11 @@ let totalReturned = 0;
 
     const today = new Date();
 
-    cheques.forEach((c,i)=>{
+    cheques
+.sort((a,b)=>{
+    return new Date(a.due || 0) - new Date(b.due || 0);
+})
+.forEach((c,i)=>{
 
         // FILTER STATUS
         if(selectedStatus.length && !selectedStatus.includes((c.status||"").toLowerCase())) return;
