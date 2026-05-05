@@ -499,6 +499,9 @@ async function loadCheques(){
 function renderCheque(){
 
     const table = document.getElementById("chequeTable");
+    let totalCollected = 0;
+let totalPending = 0;
+let totalReturned = 0;
 
     const selectedStatus = [...document.querySelectorAll('#statusFilter input:checked')]
     .map(cb => cb.value.toLowerCase().trim());
@@ -560,6 +563,23 @@ else if(c.status === "Bounced Cheque"){
 else if(c.status === "Returned to Client"){
     reminder = "Returned";
 }
+        // ===== COUNT =====
+if(c.status === "Pending"){
+    totalPending += Number(c.amount || 0);
+}
+else if(
+    c.status === "Deposited" ||
+    c.status === "Paid (Cash)" ||
+    c.status === "Cleared"
+){
+    totalCollected += Number(c.amount || 0);
+}
+else if(
+    c.status === "Bounced Cheque" ||
+    c.status === "Returned to Client"
+){
+    totalReturned += Number(c.amount || 0);
+}
         table.innerHTML += `
         <tr class="${diff<0 && c.status==='Pending' ? 'overdue-row':''}">
         <td>${i+1}</td>
@@ -579,6 +599,9 @@ else if(c.status === "Returned to Client"){
         <td>${c.narration || "-"}</td>
         </tr>`;
     });
+    document.getElementById("totalCollected").textContent = totalCollected;
+document.getElementById("totalPending").textContent = totalPending;
+document.getElementById("totalReturned").textContent = totalReturned;
 }
 
 /* DELETE */
