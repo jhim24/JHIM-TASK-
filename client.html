@@ -34,9 +34,10 @@ table{
 }
 
 th,td{
-    padding:12px;
+    padding:10px;
     border:1px solid #ddd;
     text-align:center;
+    font-size:13px;
 }
 
 th{
@@ -48,8 +49,12 @@ tr:nth-child(even){
     background:#f5f7fa;
 }
 
+tr:hover{
+    background:#eaf2ff;
+}
+
 button{
-    padding:10px 15px;
+    padding:8px 12px;
     background:#2c5fa8;
     color:white;
     border:none;
@@ -68,6 +73,7 @@ button{
 <div class="container">
 
 <button onclick="window.location.href='index.html'">⬅ Back to Cheques</button>
+
 <label>From:</label>
 <input type="date" id="fromDate">
 
@@ -75,6 +81,7 @@ button{
 <input type="date" id="toDate">
 
 <button onclick="renderClientSummary()">Apply</button>
+
 <table id="clientTable"></table>
 
 </div>
@@ -106,12 +113,14 @@ function renderClientSummary(){
 
     cheques.forEach(c => {
 
+        // ❌ skip pag walang due date
+        if(!c.due) return;
+
         const due = new Date(c.due);
 
         // ✅ FILTER BY DATE RANGE
-        if(c.due){
-    summary[c.client].total++;
-}
+        if(fromDate && due < new Date(fromDate)) return;
+        if(toDate && due > new Date(toDate)) return;
 
         if(!summary[c.client]){
             summary[c.client] = {
@@ -125,41 +134,37 @@ function renderClientSummary(){
             };
         }
 
-       // TOTAL CHEQUE BASED ON DUE DATE RANGE
-if(c.due){
-    const dueDate = new Date(c.due);
-
-    if(
-        (!fromDate || dueDate >= new Date(fromDate)) &&
-        (!toDate || dueDate <= new Date(toDate))
-    ){
+        // ✅ TOTAL (based on due only)
         summary[c.client].total++;
-    }
-}
-       if(c.due){
-    summary[c.client].amount += Number(c.amount || 0);
-}
 
+        // ✅ TOTAL AMOUNT
+        summary[c.client].amount += Number(c.amount || 0);
+
+        // ✅ STATUS COUNTS
         if(c.status === "Deposited") summary[c.client].deposited++;
         if(c.status === "Pending") summary[c.client].pending++;
         if(c.status === "Paid (Cash)") summary[c.client].cash++;
         if(c.status === "Returned to Client") summary[c.client].returned++;
 
+        // ✅ ACTIVE
         if(c.status === "Pending" || c.status === "Bounced Cheque"){
             summary[c.client].active++;
         }
     });
 
-    for(let client in summary){
+    // ✅ SORT BY HIGHEST AMOUNT
+    const sorted = Object.entries(summary)
+    .sort((a,b)=> b[1].amount - a[1].amount);
 
-        const s = summary[client];
+    // ✅ RENDER
+    for(let [client, s] of sorted){
 
         table.innerHTML += `
         <tr>
             <td style="text-align:left;">${client}</td>
             <td>${s.total}</td>
             <td>${s.active}</td>
-            <td>${s.amount}</td>
+            <td>${s.amount.toLocaleString()}</td>
             <td>${s.deposited}</td>
             <td>${s.pending}</td>
             <td>${s.cash}</td>
@@ -167,6 +172,8 @@ if(c.due){
         </tr>`;
     }
 }
+
+// AUTO LOAD
 renderClientSummary();
 
 </script>
