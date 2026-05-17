@@ -138,16 +138,21 @@ if(!c.due && !isReturned) return;
             };
         }
 
-        summary[c.client].total++;
-        summary[c.client].amount += Number(c.amount || 0);
-
-        if(c.status === "Deposited") summary[c.client].deposited++;
-        if(c.status === "Pending") summary[c.client].pending++;
-        if(c.status === "Paid (Cash)") summary[c.client].cash++;
        const status = (c.status || "").toLowerCase();
+const isReturned = status.includes("returned to client");
 
-if(status.includes("returned to client")){
+// RETURNED CHEQUE
+if(isReturned){
     summary[c.client].returned++;
+}else{
+
+    // ONLY ACTIVE CHEQUES COUNT
+    summary[c.client].total++;
+    summary[c.client].amount += Number(c.amount || 0);
+
+    if(c.status === "Deposited") summary[c.client].deposited++;
+    if(c.status === "Pending") summary[c.client].pending++;
+    if(c.status === "Paid (Cash)") summary[c.client].cash++;
 }
 
         if(c.status === "Pending" || c.status === "Bounced Cheque"){
