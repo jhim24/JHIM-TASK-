@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Client Summary</title>
+<title>Client Details</title>
 
 <style>
 body{
     font-family:Segoe UI;
     margin:0;
-    background:linear-gradient(135deg,#dfe9f3,#f5f7fa);
+    background:#f5f7fa;
 }
 
 .header{
@@ -20,7 +20,7 @@ body{
 
 .container{
     padding:20px;
-    max-width:1000px;
+    max-width:1100px;
     margin:auto;
 }
 
@@ -50,7 +50,7 @@ tr:nth-child(even){
 }
 
 tr:hover{
-    background:#eaf2ff;
+    background:#eef4ff;
 }
 
 button{
@@ -61,177 +61,104 @@ button{
     border-radius:6px;
     cursor:pointer;
 }
-
-input{
-    padding:8px;
-    margin:5px;
-}
 </style>
 </head>
 
 <body>
 
 <div class="header">
-<h2>CLIENT SUMMARY</h2>
+<h2 id="title">Client Details</h2>
 </div>
 
 <div class="container">
 
-<button onclick="window.location.href='index.html'">⬅ Back to Cheques</button>
+<button onclick="window.location.href='client.html'">
+⬅ Back
+</button>
 
-<label>From:</label>
-<input type="date" id="fromDate">
-
-<label>To:</label>
-<input type="date" id="toDate">
-
-<button onclick="renderClientSummary()">Apply</button>
-
-<table id="clientTable"></table>
+<table id="detailsTable"></table>
 
 </div>
 
 <script>
 
 let cheques = JSON.parse(localStorage.getItem("cheques")) || [];
+let selectedClient = localStorage.getItem("selectedClient");
 
-function renderClientSummary(){
+document.getElementById("title").textContent =
+selectedClient || "Client Details";
 
-    const table = document.getElementById("clientTable");
+function loadDetails(){
 
-    const fromDate = document.getElementById("fromDate").value;
-    const toDate = document.getElementById("toDate").value;
+    const table = document.getElementById("detailsTable");
 
     table.innerHTML = `
     <tr>
-        <th>Client</th>
-        <th>Total Cheques</th>
-        <th>Active</th>
-        <th>Total Amount</th>
-        <th>Deposited</th>
-        <th>Pending</th>
-        <th>Paid Cash</th>
-        <th>Returned</th>
+        <th>#</th>
+        <th>Cheque No</th>
+        <th>Amount</th>
+        <th>Due Date</th>
+        <th>Status</th>
+        <th>Narration</th>
     </tr>`;
 
-    const summary = {};
+    let filtered = cheques.filter(c =>
+        c.client === selectedClient
+    );
 
-    cheques.forEach(c => {
+    filtered.sort((a,b)=>
+        new Date(a.due || 0) - new Date(b.due || 0)
+    );
 
-        const statusRaw = (c.status || "").toLowerCase();
-        const isReturned = statusRaw.includes("returned to client");
-
-        // allow returned kahit walang due
-        if(!c.due && !isReturned) return;
-
-        const due = new Date(c.due);
-
-        if(fromDate && due < new Date(fromDate)) return;
-        if(toDate && due > new Date(toDate)) return;
-
-        if(!summary[c.client]){
-            summary[c.client] = {
-                total: 0,
-                active: 0,
-                amount: 0,
-                deposited: 0,
-                pending: 0,
-                cash: 0,
-                returned: 0
-            };
-        }
-
-        // RETURNED CHEQUE
-        if(isReturned){
-
-            summary[c.client].returned++;
-
-        }else{
-
-            // ACTIVE COUNTS
-            summary[c.client].total++;
-            summary[c.client].amount += Number(c.amount || 0);
-
-            if(c.status === "Deposited"){
-                summary[c.client].deposited++;
-            }
-
-            if(c.status === "Pending"){
-                summary[c.client].pending++;
-            }
-
-            if(c.status === "Paid (Cash)"){
-                summary[c.client].cash++;
-            }
-        }
-
-        // ACTIVE STATUS
-        if(
-            !isReturned &&
-            (c.status === "Pending" || c.status === "Bounced Cheque")
-        ){
-            summary[c.client].active++;
-        }
-
-    });
-
-    const sorted = Object.entries(summary)
-    .sort((a,b)=> b[1].amount - a[1].amount);
-
-    let grandTotal = 0;
-
-    if(sorted.length === 0){
+    if(filtered.length === 0){
 
         table.innerHTML += `
         <tr>
-            <td colspan="8">No data found</td>
+            <td colspan="6">No records found</td>
         </tr>`;
 
-    }else{
-
-        sorted.forEach(([client, s])=>{
-
-            grandTotal += s.amount;
-
-            table.innerHTML += `
-            <tr>
-                <td 
-                    style="text-align:left; cursor:pointer; color:#2c5fa8;"
-                    onclick='viewClient(${JSON.stringify(client)})'
-                >
-                    ${client}
-                </td>
-
-                <td>${s.total}</td>
-                <td>${s.active}</td>
-                <td>QAR ${s.amount.toLocaleString()}</td>
-                <td>${s.deposited}</td>
-                <td>${s.pending}</td>
-                <td>${s.cash}</td>
-                <td>${s.returned}</td>
-            </tr>`;
-        });
+        return;
     }
+
+    let total = 0;
+
+    filtered.forEach((c,index)=>{
+
+        const amount = Number(c.amount || 0);
+        total += amount;
+
+        let rowColor = "";
+
+        if(c.status === "Returned to Client"){
+            rowColor = "#ffe5e5";
+        }
+
+        if(c.status === "Bounced Cheque"){
+            rowColor = "#fff3cd";
+        }
+
+        table.innerHTML += `
+        <tr style="background:${rowColor}">
+            <td>${index + 1}</td>
+            <td>${c.chequeNo || "-"}</td>
+            <td>QAR ${amount.toLocaleString()}</td>
+            <td>${c.due || "-"}</td>
+            <td>${c.status || "-"}</td>
+            <td style="text-align:left">
+                ${c.narration || "-"}
+            </td>
+        </tr>`;
+    });
 
     table.innerHTML += `
     <tr style="font-weight:bold; background:#f1f4f9;">
-        <td>TOTAL</td>
-        <td></td>
-        <td></td>
-        <td>QAR ${grandTotal.toLocaleString()}</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td colspan="2">TOTAL</td>
+        <td>QAR ${total.toLocaleString()}</td>
+        <td colspan="3"></td>
     </tr>`;
 }
 
-function viewClient(name){
-    localStorage.setItem("selectedClient", name);
-    window.location.href = "client-details.html";
-}
-
-renderClientSummary();
+loadDetails();
 
 </script>
 
