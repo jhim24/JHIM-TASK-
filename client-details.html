@@ -99,6 +99,7 @@ function loadDetails(){
         <th>Amount</th>
         <th>Due Date</th>
         <th>Status</th>
+        <th>Date Returned</th>
         <th>Narration</th>
     </tr>`;
 
@@ -114,7 +115,7 @@ function loadDetails(){
 
         table.innerHTML += `
         <tr>
-            <td colspan="6">No records found</td>
+            <td colspan="7">No records found</td>
         </tr>`;
 
         return;
@@ -144,6 +145,7 @@ function loadDetails(){
             <td>QAR ${amount.toLocaleString()}</td>
             <td>${c.due || "-"}</td>
             <td>${c.status || "-"}</td>
+            <td>${c.returnDate || "-"}</td>
             <td style="text-align:left">
                 ${c.narration || "-"}
             </td>
@@ -154,7 +156,7 @@ function loadDetails(){
     <tr style="font-weight:bold; background:#f1f4f9;">
         <td colspan="2">TOTAL</td>
         <td>QAR ${total.toLocaleString()}</td>
-        <td colspan="3"></td>
+        <td colspan="4"></td>
     </tr>`;
 }
 
