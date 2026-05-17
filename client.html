@@ -180,7 +180,7 @@ if(isReturned){
         table.innerHTML += `
         <tr>
             <td style="text-align:left; cursor:pointer; color:#2c5fa8;"
-            onclick="viewClient('${client}')">
+           onclick='viewClient(${JSON.stringify(client)})'
             ${client}
             </td>
             <td>${s.total}</td>
