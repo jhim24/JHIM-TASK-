@@ -155,9 +155,9 @@ if(isReturned){
     if(c.status === "Paid (Cash)") summary[c.client].cash++;
 }
 
-        if(c.status === "Pending" || c.status === "Bounced Cheque"){
-            summary[c.client].active++;
-        }
+       if(!isReturned && (c.status === "Pending" || c.status === "Bounced Cheque")){
+    summary[c.client].active++;
+}
     });
 
     const sorted = Object.entries(summary)
