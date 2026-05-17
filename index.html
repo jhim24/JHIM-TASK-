@@ -447,16 +447,21 @@ let chequeEditIndex = -1;
 
 /* ADD CHEQUE */
 async function addCheque(){
-    const data = {
-        client: client.value,
-        chequeNo: chequeNo.value,
-        amount: amount.value,
-        due: chequeDue.value,
-        transDate: transDate.value,
-        status: chequeStatus.value,
-        narration: narration.value || ""
-    };
+   const data = {
+    client: client.value,
+    chequeNo: chequeNo.value,
+    amount: amount.value,
+    due: chequeDue.value,
+    transDate: transDate.value,
+    status: chequeStatus.value,
+    narration: narration.value || "",
 
+    // AUTO SAVE RETURN DATE
+    returnDate:
+    chequeStatus.value === "Returned to Client"
+    ? new Date().toISOString().split("T")[0]
+    : ""
+};
     if(!data.client) return alert("Enter client");
 
     try {
