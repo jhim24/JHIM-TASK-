@@ -398,6 +398,8 @@ Returned to Client: <span id="returnedClientCount">0</span>
 
 <input id="transDate" type="date">
 
+<input id="returnDate" type="date">
+
 <div style="grid-column:span 2;">
 <button onclick="addCheque()">Save Cheque</button>
 </div>
@@ -428,6 +430,7 @@ const chequeNo = document.getElementById("chequeNo");
 const amount = document.getElementById("amount");
 const chequeDue = document.getElementById("chequeDue");
 const transDate = document.getElementById("transDate");
+const returnDate = document.getElementById("returnDate");
 const chequeStatus = document.getElementById("chequeStatus");
 const narration = document.getElementById("narration");
 
@@ -458,9 +461,9 @@ async function addCheque(){
 
     // AUTO SAVE RETURN DATE
     returnDate:
-    chequeStatus.value === "Returned to Client"
-    ? new Date().toISOString().split("T")[0]
-    : ""
+chequeStatus.value === "Returned to Client"
+? returnDate.value
+: ""
 };
     if(!data.client) return alert("Enter client");
 
@@ -636,6 +639,7 @@ function editCheque(i){
     transDate.value = c.transDate || "";
     chequeStatus.value = c.status;
     narration.value = c.narration || "";
+    returnDate.value = c.returnDate || "";
     chequeEditIndex = i;
 }
 
