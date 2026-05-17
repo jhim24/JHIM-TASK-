@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Client Details</title>
+<title>Client Summary</title>
 
 <style>
 body{
     font-family:Segoe UI;
     margin:0;
-    background:#f5f7fa;
+    background:linear-gradient(135deg,#dfe9f3,#f5f7fa);
 }
 
 .header{
@@ -20,7 +20,7 @@ body{
 
 .container{
     padding:20px;
-    max-width:1100px;
+    max-width:1000px;
     margin:auto;
 }
 
@@ -29,12 +29,15 @@ table{
     border-collapse:collapse;
     margin-top:20px;
     background:white;
+    border-radius:10px;
+    overflow:hidden;
 }
 
 th,td{
     padding:10px;
     border:1px solid #ddd;
     text-align:center;
+    font-size:13px;
 }
 
 th{
@@ -46,6 +49,10 @@ tr:nth-child(even){
     background:#f5f7fa;
 }
 
+tr:hover{
+    background:#eaf2ff;
+}
+
 button{
     padding:8px 12px;
     background:#2c5fa8;
@@ -54,65 +61,177 @@ button{
     border-radius:6px;
     cursor:pointer;
 }
+
+input{
+    padding:8px;
+    margin:5px;
+}
 </style>
 </head>
 
 <body>
 
 <div class="header">
-<h2 id="title">Client Details</h2>
+<h2>CLIENT SUMMARY</h2>
 </div>
 
 <div class="container">
 
-<button onclick="window.location.href='client.html'">⬅ Back</button>
+<button onclick="window.location.href='index.html'">⬅ Back to Cheques</button>
 
-<table id="detailsTable"></table>
+<label>From:</label>
+<input type="date" id="fromDate">
+
+<label>To:</label>
+<input type="date" id="toDate">
+
+<button onclick="renderClientSummary()">Apply</button>
+
+<table id="clientTable"></table>
 
 </div>
 
 <script>
 
 let cheques = JSON.parse(localStorage.getItem("cheques")) || [];
-let selectedClient = localStorage.getItem("selectedClient");
 
-document.getElementById("title").textContent = selectedClient;
+function renderClientSummary(){
 
-function loadDetails(){
+    const table = document.getElementById("clientTable");
 
-    const table = document.getElementById("detailsTable");
+    const fromDate = document.getElementById("fromDate").value;
+    const toDate = document.getElementById("toDate").value;
 
     table.innerHTML = `
     <tr>
-        <th>#</th>
-        <th>Cheque No</th>
-        <th>Amount</th>
-        <th>Due</th>
-        <th>Status</th>
-        <th>Narration</th>
+        <th>Client</th>
+        <th>Total Cheques</th>
+        <th>Active</th>
+        <th>Total Amount</th>
+        <th>Deposited</th>
+        <th>Pending</th>
+        <th>Paid Cash</th>
+        <th>Returned</th>
     </tr>`;
 
-    let i = 1;
+    const summary = {};
 
-    cheques
-    .sort((a,b)=> new Date(a.due || 0) - new Date(b.due || 0))
-    .forEach(c=>{
+    cheques.forEach(c => {
 
-        if(c.client !== selectedClient) return;
+        const statusRaw = (c.status || "").toLowerCase();
+        const isReturned = statusRaw.includes("returned to client");
+
+        // allow returned kahit walang due
+        if(!c.due && !isReturned) return;
+
+        const due = new Date(c.due);
+
+        if(fromDate && due < new Date(fromDate)) return;
+        if(toDate && due > new Date(toDate)) return;
+
+        if(!summary[c.client]){
+            summary[c.client] = {
+                total: 0,
+                active: 0,
+                amount: 0,
+                deposited: 0,
+                pending: 0,
+                cash: 0,
+                returned: 0
+            };
+        }
+
+        // RETURNED CHEQUE
+        if(isReturned){
+
+            summary[c.client].returned++;
+
+        }else{
+
+            // ACTIVE COUNTS
+            summary[c.client].total++;
+            summary[c.client].amount += Number(c.amount || 0);
+
+            if(c.status === "Deposited"){
+                summary[c.client].deposited++;
+            }
+
+            if(c.status === "Pending"){
+                summary[c.client].pending++;
+            }
+
+            if(c.status === "Paid (Cash)"){
+                summary[c.client].cash++;
+            }
+        }
+
+        // ACTIVE STATUS
+        if(
+            !isReturned &&
+            (c.status === "Pending" || c.status === "Bounced Cheque")
+        ){
+            summary[c.client].active++;
+        }
+
+    });
+
+    const sorted = Object.entries(summary)
+    .sort((a,b)=> b[1].amount - a[1].amount);
+
+    let grandTotal = 0;
+
+    if(sorted.length === 0){
 
         table.innerHTML += `
         <tr>
-            <td>${i++}</td>
-            <td>${c.chequeNo}</td>
-            <td>QAR ${Number(c.amount || 0).toLocaleString()}</td>
-            <td>${c.due || "-"}</td>
-            <td>${c.status}</td>
-            <td style="text-align:left">${c.narration || "-"}</td>
+            <td colspan="8">No data found</td>
         </tr>`;
-    });
+
+    }else{
+
+        sorted.forEach(([client, s])=>{
+
+            grandTotal += s.amount;
+
+            table.innerHTML += `
+            <tr>
+                <td 
+                    style="text-align:left; cursor:pointer; color:#2c5fa8;"
+                    onclick='viewClient(${JSON.stringify(client)})'
+                >
+                    ${client}
+                </td>
+
+                <td>${s.total}</td>
+                <td>${s.active}</td>
+                <td>QAR ${s.amount.toLocaleString()}</td>
+                <td>${s.deposited}</td>
+                <td>${s.pending}</td>
+                <td>${s.cash}</td>
+                <td>${s.returned}</td>
+            </tr>`;
+        });
+    }
+
+    table.innerHTML += `
+    <tr style="font-weight:bold; background:#f1f4f9;">
+        <td>TOTAL</td>
+        <td></td>
+        <td></td>
+        <td>QAR ${grandTotal.toLocaleString()}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>`;
 }
 
-loadDetails();
+function viewClient(name){
+    localStorage.setItem("selectedClient", name);
+    window.location.href = "client-details.html";
+}
+
+renderClientSummary();
 
 </script>
 
